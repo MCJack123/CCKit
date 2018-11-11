@@ -1,0 +1,5 @@
+os.unloadAPI("CCGraphics")
+os.unloadAPI("CCKit")
+os.unloadAPI("CCView")
+os.unloadAPI("CCLog")
+--shell.run("rm", "/CCV")
