@@ -6,23 +6,27 @@ Copy this entire repository into a folder named `CCKit` at the root of your Comp
 
 ## Quick Start
 1. Load the `CCKit` api:
-    
-    os.loadAPI("CCKit/CCKit.lua")
+```
+os.loadAPI("CCKit/CCKit.lua")
+```
 2. Create a main view controller:
-    
-    function MyViewController()
-        local vc = CCKit.CCViewController()
-        return vc
-    end
+```
+function MyViewController()
+    local vc = CCKit.CCViewController()
+    return vc
+end
+```
 3. Put the code for the UI after creating `vc`:
-    
-    function vc:viewDidLoad()
-        local label = CCKit.CCLabel(1, 1, "Text")
-        self:addSubview(label)
-    end
+```
+function vc:viewDidLoad()
+    local label = CCKit.CCLabel(1, 1, "Text")
+    self:addSubview(label)
+end
+```
 4. Start the main loop:
-    
-    CCKit.CCMain(5, 2, 12, 4, "Window", MyViewController, colors.blue, "Application")
+```
+CCKit.CCMain(5, 2, 12, 4, "Window", MyViewController, colors.blue, "Application")
+```
 
 ## Classes
 Classes are created with `<class>.<class>(<arguments>)` (e.g. `CCLabel.CCLabel(x, y, text)`).  
