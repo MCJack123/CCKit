@@ -29,7 +29,7 @@ CCKit.CCMain(5, 2, 12, 4, "Window", MyViewController, colors.blue, "Application"
 ```
 
 # Classes
-Classes are created with `<class>.<class>(<arguments>)` (e.g. `CCLabel.CCLabel(x, y, text)`).  
+Classes are created with `CCKit.<class>(<arguments>)` (e.g. `CCKit.CCLabel(x, y, text)`) if you load the CCKit API.  
 All methods must be called with a colon and not a period (e.g. `textView:setText(text)`, not `textView.setText(text)`).  
   
 See the wiki for a list of classes.
