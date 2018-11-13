@@ -16,8 +16,12 @@ end
 
 CCApplication = require("CCApplication")
 CCButton = require("CCButton")
+CCImageLoader = require("CCImageLoader")
+os.loadAPI(CCKitDir .. "/CCImageType.lua")
 CCImageView = require("CCImageView")
+CCImageWriter = require("CCImageWriter")
 CCLabel = require("CCLabel")
+if CCLog == nil then os.loadAPI(CCKitDir .. "/CCLog.lua") end
 CCProgressBar = require("CCProgressBar")
 CCScrollView = require("CCScrollView")
 CCTextView = require("CCTextView")

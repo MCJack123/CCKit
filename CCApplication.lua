@@ -38,6 +38,7 @@ function CCApplication(name)
     if name ~= nil then retval.log = CCLog.CCLog(name)
     else retval.log = CCLog.default end
     CCLog.default.logToConsole = false
+    retval.log:open()
     function retval:setBackgroundColor(color)
         self.backgroundColor = color
         term.setBackgroundColor(color)

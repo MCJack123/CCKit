@@ -49,6 +49,7 @@ end
 local function redrawChar(win, x, y)
     win.setCursorPos(x+1, y+1)
     if win.screenBuffer[x][y] == nil then error("pixel not found at " .. x .. ", " .. y) end
+    if win.screenBuffer[x][y].transparent == true then return end
     if win.screenBuffer[x][y].useCharacter == true then win.blit(win.screenBuffer[x][y].character, cp(win.screenBuffer[x][y].fgColor), cp(win.screenBuffer[x][y].bgColor))
     else
         local char, flip = pixelToChar(win.screenBuffer[x][y].pixelCode)
@@ -297,6 +298,7 @@ function drawCapture(win, x, y, image)
     if x + image.termWidth > win.screenBuffer.termWidth or y + image.termHeight > win.screenBuffer.termHeight then error("region out of bounds", 2) end
     for px=x,x+image.termWidth-1 do for py=y,y+image.termHeight-1 do 
         --print(px .. " " .. py)
+        if image[px-x] == nil then error("no row at " .. px-x) end
         if image[px-x][py-y] == nil then error("no data at " .. px-x .. ", " .. py-y) end
         win.screenBuffer[px][py] = image[px-x][py-y] end end
     redrawScreen(win)

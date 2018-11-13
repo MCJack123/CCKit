@@ -24,7 +24,7 @@ end
 
 -- this doesn't account for leap years, but that doesn't matter in Minecraft
 local junOff = 31 + 28 + 31 + 30 + 31 + 30
-local function dayToString(day)
+function dayToString(day)
     if day <= 31 then return "Jan " .. day
     elseif day > 31 and day <= 31 + 28 then return "Feb " .. day - 31
     elseif day > 31 + 28 and day <= 31 + 28 + 31 then return "Mar " .. day - 31 - 28
@@ -48,11 +48,13 @@ function CCLog(name)
     function retval:open()
         if self.fileDescriptor == nil then
             self.fileDescriptor = fs.open("CCKit/logs/" .. retval.name .. ".log", fs.exists("CCKit/logs/" .. retval.name .. ".log") and "a" or "w")
+            if self.fileDescriptor == nil then error("Could not open log file") end
             self.fileDescriptor.write("=== Logging for " .. name .. " started at " .. dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " ===\n")
             self.fileDescriptor.flush()
         end
     end
     function retval:debug(text, class, lineno)
+        if self == nil then error("No self") end
         self.fileDescriptor.write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Debug] ")
         if class ~= nil then 
             self.fileDescriptor.write(class)

@@ -33,14 +33,18 @@ function MyViewController()
         self.currentApplication:registerObject(newwin, newwin.name)
     end
     function retval:viewDidLoad()
-        local file = fs.open("CCKit/testimage.lon", "r")
-        local image = textutils.unserialize(file.readAll())
-        file.close()
+        local loader = CCKit.CCImageLoader()
+        local res = loader:open("/painttest.nfp")
+        if res == 1 then loader.type = CCImageType.nfp end
+        local image = loader:read()
+        if image.termWidth == 0 then error("Error reading file") end
+        loader:close()
+        self.currentApplication.log:debug(textutils.serialize(image))
         local imview = CCKit.CCImageView(1, 1, image)
         self.view:addSubview(imview)
         local label = CCKit.CCLabel(1, 0, "Image:")
         self.view:addSubview(label)
-        local button = CCKit.CCButton(2, 5, 8, 1)
+        local button = CCKit.CCButton(15, 11, 8, 1)
         button:setText("Alert")
         button:setAction(self.alert, self)
         self.view:addSubview(button)
@@ -48,4 +52,4 @@ function MyViewController()
     return retval
 end
 
-CCKit.CCMain(5, 2, 12, 8, "Picture", MyViewController, colors.blue, "applicationtest")
+CCKit.CCMain(5, 2, 38, 14, "Picture", MyViewController, colors.blue, "applicationtest")
