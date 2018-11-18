@@ -6,12 +6,11 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-if CCGraphics == nil then os.loadAPI("CCKit/CCGraphics.lua") end
+os.loadAPI("CCKit/CCKitGlobals.lua")
+if CCGraphics == nil then os.loadAPI(CCKitGlobals.CCKitDir.."/CCGraphics.lua") end
+os.loadAPI(CCKitGlobals.CCKitDir.."/CCEventHandler.lua")
 
 -- Constants for the colors of the window
-local titleBarColor = colors.yellow
-local titleBarTextColor = colors.black
-local windowBackgroundColor = colors.white
 
 local charset = {}
 
@@ -31,9 +30,7 @@ function string.random(length)
 end
 
 function CCWindow(x, y, width, height)
-    local retval = {}
-    retval.name = string.random(8)
-    retval.class = "CCWindow"
+    local retval = CCEventHandler.CCEventHandler("CCWindow")
     retval.window = window.create(term.native(), x, y, width, height)
     retval.title = ""
     retval.frame = {}
@@ -50,19 +47,22 @@ function CCWindow(x, y, width, height)
     retval.isDragging = false
     retval.mouseOffset = 0
     retval.repaintColor = colors.black
-    retval.currentApplication = nil
+    retval.application = nil
     retval.closing = false
     retval.maximized = false
+    retval.maximizable = true
     function retval:redraw()
         if not self.closing then
             self.window.setCursorBlink(false)
-            CCGraphics.drawLine(retval.window, 0, 0, self.frame.width-1, false, titleBarColor, titleBarTextColor)
+            CCGraphics.drawLine(retval.window, 0, 0, self.frame.width-1, false, CCKitGlobals.titleBarColor, CCKitGlobals.titleBarTextColor)
             CCGraphics.setPixelColors(retval.window, self.frame.width-1, 0, colors.white, colors.red)
-            CCGraphics.setPixelColors(retval.window, self.frame.width-2, 0, colors.white, colors.lime)
             CCGraphics.setCharacter(retval.window, self.frame.width-1, 0, "X")
-            if self.maximized then CCGraphics.setCharacter(retval.window, self.frame.width-2, 0, "o")
-            else CCGraphics.setCharacter(retval.window, self.frame.width-2, 0, "O") end
-            CCGraphics.drawBox(retval.window, 0, 1, self.frame.width, self.frame.height - 1, windowBackgroundColor)
+            if self.maximizable then
+                CCGraphics.setPixelColors(retval.window, self.frame.width-2, 0, colors.white, colors.lime)
+                if self.maximized then CCGraphics.setCharacter(retval.window, self.frame.width-2, 0, "o")
+                else CCGraphics.setCharacter(retval.window, self.frame.width-2, 0, "O") end
+            end
+            CCGraphics.drawBox(retval.window, 0, 1, self.frame.width, self.frame.height - 1, CCKitGlobals.windowBackgroundColor)
             self:setTitle(self.title)
             if self.viewController ~= nil then self.viewController.view:draw() end
         end
@@ -87,7 +87,7 @@ function CCWindow(x, y, width, height)
                 self.isDragging = true 
                 self.mouseOffset = px - self.frame.x
                 return true
-            elseif py == self.frame.y and px == self.frame.x + self.frame.width - 2 then
+            elseif py == self.frame.y and px == self.frame.x + self.frame.width - 2 and self.maximizable then
                 if self.maximized then
                     self.frame.x = self.defaultFrame.x
                     self.frame.y = self.defaultFrame.y
@@ -95,7 +95,7 @@ function CCWindow(x, y, width, height)
                     self.frame.height = self.defaultFrame.height
                     self.maximized = false
                     self:resize(self.frame.width, self.frame.height)
-                    self.currentApplication:setBackgroundColor(self.currentApplication.backgroundColor)
+                    self.application:setBackgroundColor(self.application.backgroundColor)
                 else
                     self.defaultFrame.x = self.frame.x
                     self.defaultFrame.y = self.frame.y
@@ -106,7 +106,7 @@ function CCWindow(x, y, width, height)
                     self.maximized = true
                     self:resize(term.native().getSize())
                 end
-                self.currentApplication.log:debug(tostring(self.defaultFrame.width))
+                self.application.log:debug(tostring(self.defaultFrame.width))
                 return true
             elseif py == self.frame.y and px == self.frame.x + self.frame.width - 1 then
                 CCGraphics.endGraphics(self.window)
@@ -142,18 +142,24 @@ function CCWindow(x, y, width, height)
     end
     function retval:setViewController(vc, app)
         self.viewController = vc
-        self.currentApplication = app
-        self.viewController:loadView(self, self.currentApplication)
+        self.application = app
+        self.viewController:loadView(self, self.application)
         self.viewController:viewDidLoad()
         self.viewController.view:draw()
         --self:redraw()
     end
     function retval:registerObject(obj)
-        if self.currentApplication ~= nil then
-            self.currentApplication:registerObject(obj, obj.name, false)
+        if self.application ~= nil then
+            self.application:registerObject(obj, obj.name, false)
         end
     end
-    retval.events = {mouse_drag = {func = retval.moveToPos, self = retval.name}, mouse_click = {func = retval.startDrag, self = retval.name}, mouse_up = {func = retval.stopDrag, self = retval.name}}
+    function retval:close()
+        if self.viewController ~= nil then self.viewController:dismiss() end
+        os.queueEvent("closed_window", self.name)
+    end
+    retval:addEvent("mouse_drag", retval.moveToPos)
+    retval:addEvent("mouse_click", retval.startDrag)
+    retval:addEvent("mouse_up", retval.stopDrag)
     CCGraphics.initGraphics(retval.window)
     retval:redraw()
     return retval

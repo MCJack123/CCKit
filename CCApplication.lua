@@ -5,7 +5,8 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-if CCLog == nil then os.loadAPI("CCKit/CCLog.lua") end
+os.loadAPI("CCKit/CCKitGlobals.lua")
+if CCLog == nil then os.loadAPI(CCKitGlobals.CCKitDir.."/CCLog.lua") end
 
 local colorString = "0123456789abcdef"
 
@@ -98,11 +99,15 @@ function CCApplication(name)
                 --print("got event " .. ev)
                 --print(textutils.serialize(v))
                 for l,w in pairs(v) do 
-                    if self.objects[w.self] == nil then error(w.self .. " is nil") end
-                    if w.func(self.objects[w.self], p1, p2, p3, p4, p5) then 
-                        redraws[w.self] = true
-                        didEvent = true
-                        break 
+                    if self.objects[w.self] == nil then 
+                        self.log:debug(textutils.serialize(w))
+                        self.log:error("Could not find object for " .. tostring(w.self), "CCApplication", 161)
+                    else
+                        if w.func(self.objects[w.self], p1, p2, p3, p4, p5) then 
+                            redraws[w.self] = true
+                            didEvent = true
+                            break 
+                        end
                     end
                 end 
             end end

@@ -5,25 +5,30 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-local CCKitDir = "CCKit"
+os.loadAPI("CCKit/CCKitGlobals.lua")
 
 local function require(class)
-    os.loadAPI(CCKitDir .. "/" .. class .. ".lua")
+    local remove = true
+    if _G[class] ~= nil then remove = false
+    else os.loadAPI(CCKitGlobals.CCKitDir .. "/" .. class .. ".lua") end
     local temp = _G[class]
-    os.unloadAPI(class)
+    if remove then os.unloadAPI(class) end
     return temp[class]
 end
 
 CCApplication = require("CCApplication")
 CCButton = require("CCButton")
+CCCheckbox = require("CCCheckbox")
+CCControl = require("CCControl")
 CCImageLoader = require("CCImageLoader")
-os.loadAPI(CCKitDir .. "/CCImageType.lua")
+os.loadAPI(CCKitGlobals.CCKitDir .. "/CCImageType.lua")
 CCImageView = require("CCImageView")
 CCImageWriter = require("CCImageWriter")
 CCLabel = require("CCLabel")
-if CCLog == nil then os.loadAPI(CCKitDir .. "/CCLog.lua") end
+if CCLog == nil then os.loadAPI(CCKitGlobals.CCKitDir .. "/CCLog.lua") end
 CCProgressBar = require("CCProgressBar")
 CCScrollView = require("CCScrollView")
+CCSlider = require("CCSlider")
 CCTextView = require("CCTextView")
 CCView = require("CCView")
 CCViewController = require("CCViewController")

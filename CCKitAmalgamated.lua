@@ -470,7 +470,7 @@ function CCWindow(x, y, width, height)
     retval.isDragging = false
     retval.mouseOffset = 0
     retval.repaintColor = colors.black
-    retval.currentApplication = nil
+    retval.application = nil
     retval.closing = false
     function retval:redraw()
         if not self.closing then
@@ -536,15 +536,15 @@ function CCWindow(x, y, width, height)
     end
     function retval:setViewController(vc, app)
         self.viewController = vc
-        self.currentApplication = app
-        self.viewController:loadView(self, self.currentApplication)
+        self.application = app
+        self.viewController:loadView(self, self.application)
         self.viewController:viewDidLoad()
         self.viewController.view:draw()
         --self:redraw()
     end
     function retval:registerObject(obj)
-        if self.currentApplication ~= nil then
-            self.currentApplication:registerObject(obj, obj.name, false)
+        if self.application ~= nil then
+            self.application:registerObject(obj, obj.name, false)
         end
     end
     retval.events = {mouse_drag = {func = retval.moveToPos, self = retval.name}, mouse_click = {func = retval.startDrag, self = retval.name}, mouse_up = {func = retval.stopDrag, self = retval.name}}
@@ -566,7 +566,7 @@ function CCView(x, y, width, height)
     retval.class = "CCView"
     retval.parentWindowName = nil
     retval.parentWindow = nil
-    retval.currentApplication = nil
+    retval.application = nil
     retval.window = nil
     retval.hasEvents = false
     retval.events = {}
@@ -585,15 +585,15 @@ function CCView(x, y, width, height)
     end
     function retval:addSubview(view)
         if view == nil then error("view added is nil", 2) end
-        if self.currentApplication == nil then error("current application is nil", 2) end
-        if view.hasEvents then self.currentApplication:registerObject(view, view.name, false) end
-        view:setParent(self.window, self.currentApplication, self.parentWindowName, self.frame.absoluteX, self.frame.absoluteY)
+        if self.application == nil then error("current application is nil", 2) end
+        if view.hasEvents then self.application:registerObject(view, view.name, false) end
+        view:setParent(self.window, self.application, self.parentWindowName, self.frame.absoluteX, self.frame.absoluteY)
         table.insert(self.subviews, view)
     end
     function retval:setParent(parent, application, name, absoluteX, absoluteY)
         self.parentWindow = parent
         self.parentWindowName = name
-        self.currentApplication = application
+        self.application = application
         self.frame.absoluteX = absoluteX + self.frame.x
         self.frame.absoluteY = absoluteY + self.frame.y
         self.window = window.create(self.parentWindow, self.frame.x+1, self.frame.y+1, self.frame.width, self.frame.height)
@@ -606,8 +606,8 @@ function CCView(x, y, width, height)
         for k,view in pairs(self.subviews) do view:updateAbsolutes(addX, addY) end
     end
     function retval:deregisterSubview(view)
-        if view.hasEvents and self.currentApplication ~= nil then
-            self.currentApplication:deregisterObject(view.name)
+        if view.hasEvents and self.application ~= nil then
+            self.application:deregisterObject(view.name)
             for k,v in pairs(view.subviews) do view:deregisterSubview(v) end
         end
     end
@@ -627,14 +627,14 @@ function CCViewController()
     local retval = {}
     retval.view = {}
     retval.parentWindow = nil
-    retval.currentApplication = nil
+    retval.application = nil
     function retval:loadView(win, app)
         --print("loaded view " .. win.name)
         self.parentWindow = win
-        self.currentApplication = app
+        self.application = app
         local width, height = win.window.getSize()
         self.view = CCView(0, 1, width, height - 1)
-        self.view:setParent(self.parentWindow.window, self.currentApplication, self.parentWindow.name, retval.parentWindow.frame.x, retval.parentWindow.frame.y)
+        self.view:setParent(self.parentWindow.window, self.application, self.parentWindow.name, retval.parentWindow.frame.x, retval.parentWindow.frame.y)
     end
     retval.superLoadView = retval.loadView
     function retval:viewDidLoad()

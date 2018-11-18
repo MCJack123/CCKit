@@ -168,7 +168,7 @@ end
 function setPixel(win, x, y)
     if not win.graphicsInitialized then error("graphics not initialized", 2) end
     if x > win.screenBuffer.width or y > win.screenBuffer.height then error("position out of bounds", 2) end
-    win.screenBuffer[x][y].useCharacter = false
+    win.screenBuffer[math.floor(x / 2)][math.floor(y / 3)].useCharacter = false
     win.screenBuffer[math.floor(x / 2)][math.floor(y / 3)].pixelCode = bit.bor(win.screenBuffer[math.floor(x / 2)][math.floor(y / 3)].pixelCode, 2^(2*(y % 3) + (x % 2)))
     redrawChar(win, math.floor(x / 2), math.floor(y / 3))
 end
@@ -180,7 +180,7 @@ end
 function clearPixel(win, x, y)
     if not win.graphicsInitialized then error("graphics not initialized", 2) end
     if x > win.screenBuffer.width or y > win.screenBuffer.height then error("position out of bounds", 2) end
-    win.screenBuffer[x][y].useCharacter = false
+    win.screenBuffer[math.floor(x / 2)][math.floor(y / 3)].useCharacter = false
     win.screenBuffer[math.floor(x / 2)][math.floor(y / 3)].pixelCode = bit.band(win.screenBuffer[math.floor(x / 2)][math.floor(y / 3)].pixelCode, bit.bnot(2^(2*(y % 3) + (x % 2))))
     redrawChar(win, math.floor(x / 2), math.floor(y / 3))
 end

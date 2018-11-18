@@ -6,14 +6,15 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-if CCGraphics == nil then os.loadAPI("CCKit/CCGraphics.lua") end
+os.loadAPI("CCKit/CCKitGlobals.lua")
+if CCGraphics == nil then os.loadAPI(CCKitGlobals.CCKitDir.."/CCGraphics.lua") end
 
 function CCView(x, y, width, height)
     local retval = {}
     retval.class = "CCView"
     retval.parentWindowName = nil
     retval.parentWindow = nil
-    retval.currentApplication = nil
+    retval.application = nil
     retval.window = nil
     retval.hasEvents = false
     retval.events = {}
@@ -31,16 +32,16 @@ function CCView(x, y, width, height)
         end
     end
     function retval:addSubview(view)
-        if view == nil then error("nope1") end
-        if self.currentApplication == nil then error("nope2") end
-        if view.hasEvents then self.currentApplication:registerObject(view, view.name, false) end
-        view:setParent(self.window, self.currentApplication, self.parentWindowName, self.frame.absoluteX, self.frame.absoluteY)
+        if view == nil then error("Cannot add nil subview", 2) end
+        if self.application == nil then error("Application not found", 2) end
+        if view.hasEvents then self.application:registerObject(view, view.name, false) end
+        view:setParent(self.window, self.application, self.parentWindowName, self.frame.absoluteX, self.frame.absoluteY)
         table.insert(self.subviews, view)
     end
     function retval:setParent(parent, application, name, absoluteX, absoluteY)
         self.parentWindow = parent
         self.parentWindowName = name
-        self.currentApplication = application
+        self.application = application
         self.frame.absoluteX = absoluteX + self.frame.x
         self.frame.absoluteY = absoluteY + self.frame.y
         self.window = window.create(self.parentWindow, self.frame.x+1, self.frame.y+1, self.frame.width, self.frame.height)
@@ -53,8 +54,8 @@ function CCView(x, y, width, height)
         for k,view in pairs(self.subviews) do view:updateAbsolutes(addX, addY) end
     end
     function retval:deregisterSubview(view)
-        if view.hasEvents and self.currentApplication ~= nil then
-            self.currentApplication:deregisterObject(view.name)
+        if view.hasEvents and self.application ~= nil then
+            self.application:deregisterObject(view.name)
             for k,v in pairs(view.subviews) do view:deregisterSubview(v) end
         end
     end

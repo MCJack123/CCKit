@@ -6,7 +6,8 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCView.lua")
+os.loadAPI("CCKit/CCKitGlobals.lua")
+os.loadAPI(CCKitGlobals.CCKitDir.."/CCView.lua")
 
 function CCProgressBar(x, y, width)
     local retval = CCView.CCView(x, y, width, 1)

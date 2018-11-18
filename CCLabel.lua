@@ -5,12 +5,13 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCView.lua")
+os.loadAPI("CCKit/CCKitGlobals.lua")
+os.loadAPI(CCKitGlobals.CCKitDir.."/CCView.lua")
 
 function CCLabel(x, y, text)
     local retval = CCView.CCView(x, y, string.len(text), 1)
     retval.text = text
-    retval.textColor = colors.black
+    retval.textColor = CCKitGlobals.defaultTextColor
     function retval:draw()
         if self.parentWindow ~= nil then
             for px=0,self.frame.width-1 do CCGraphics.setPixelColors(self.window, px, 0, self.textColor, self.backgroundColor) end

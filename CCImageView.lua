@@ -6,7 +6,8 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCView.lua")
+os.loadAPI("CCKit/CCKitGlobals.lua")
+os.loadAPI(CCKitGlobals.CCKitDir.."/CCView.lua")
 
 function CCImageView(x, y, image)
     local retval = CCView.CCView(x, y, image.termWidth, image.termHeight)

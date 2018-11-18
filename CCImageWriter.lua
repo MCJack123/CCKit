@@ -6,8 +6,9 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-if CCLog == nil then os.loadAPI("CCKit/CCLog.lua") end
-if CCImageType == nil then os.loadAPI("CCKit/CCImageType.lua") end
+os.loadAPI("CCKit/CCKitGlobals.lua")
+if CCLog == nil then os.loadAPI(CCKitGlobals.CCKitDir.."/CCLog.lua") end
+if CCImageType == nil then os.loadAPI(CCKitGlobals.CCKitDir.."/CCImageType.lua") end
 
 local colorString = "0123456789abcdef"
 

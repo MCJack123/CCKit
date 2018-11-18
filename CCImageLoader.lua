@@ -7,8 +7,9 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-if CCLog == nil then os.loadAPI("CCKit/CCLog.lua") end
-if CCImageType == nil then os.loadAPI("CCKit/CCImageType.lua") end
+os.loadAPI("CCKit/CCKitGlobals.lua")
+if CCLog == nil then os.loadAPI(CCKitGlobals.CCKitDir.."/CCLog.lua") end
+if CCImageType == nil then os.loadAPI(CCKitGlobals.CCKitDir.."/CCImageType.lua") end
 
 local function inputIter(inputf)
     return inputf
@@ -55,7 +56,7 @@ local function loadNFP(inputf)
             retval[x-offset][k-1] = {}
             local ch = string.sub(v, x-offset+1, x-offset+1)
             if type(ch) ~= "string" or ch == "" or ch == nil then ch = " " end
-            CCLog.default:debug("decoder", "ch is " .. tostring(ch) .. ", x is " .. x)
+            --CCLog.default:debug("decoder", "ch is " .. tostring(ch) .. ", x is " .. x)
             if ch == " " then retval[x-offset][k-1].transparent = true
             else retval[x-offset][k-1].bgColor = bit.blshift(1, tonumber(ch, 16)) end
             retval[x-offset][k-1].fgColor = 1
