@@ -6,11 +6,12 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-os.loadAPI(CCKitGlobals.CCKitDir.."/CCView.lua")
-os.loadAPI(CCKitGlobals.CCKitDir.."/CCLineBreakMode.lua")
+local CCView = require("CCView")
+loadAPI("CCLineBreakMode")
+loadAPI("CCGraphics")
 
 function CCTextView(x, y, width, height)
-    local retval = CCView.CCView(x, y, width, height)
+    local retval = CCView(x, y, width, height)
     retval.textColor = CCKitGlobals.defaultTextColor
     retval.text = ""
     retval.lineBreakMode = CCLineBreakMode.byWordWrapping

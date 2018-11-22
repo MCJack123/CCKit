@@ -7,10 +7,11 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-os.loadAPI(CCKitGlobals.CCKitDir.."/CCControl.lua")
+local CCControl = require("CCControl")
+loadAPI("CCGraphics")
 
 function CCSlider(x, y, width)
-    local retval = CCControl.CCControl(x, y, width, 1)
+    local retval = CCControl(x, y, width, 1)
     retval.value = 0.0
     retval.minimumValue = 0.0
     retval.maximumValue = 100.0

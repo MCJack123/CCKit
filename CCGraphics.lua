@@ -141,6 +141,7 @@ end
 -- Returns: foreground color, background color
 function setPixelColors(win, x, y, fgColor, bgColor)
     if not win.graphicsInitialized then error("graphics not initialized", 2) end
+    if x % 1 ~= 0 or y % 1 ~= 0 then error("coordinates must be integers, got (" .. x .. ", " .. y .. ")", 2) end
     if x > win.screenBuffer.termWidth or y > win.screenBuffer.termHeight then error("position out of bounds", 2) end
     if fgColor ~= nil then win.screenBuffer[x][y].fgColor = fgColor end
     if bgColor ~= nil then win.screenBuffer[x][y].bgColor = bgColor end
@@ -203,7 +204,7 @@ end
 -- Parameter: char = the character to print
 function setCharacter(win, x, y, char)
     if not win.graphicsInitialized then error("graphics not initialized", 2) end
-    if win.screenBuffer[x] == nil or win.screenBuffer[x][y] == nil then error("position out of bounds", 2) end
+    if win.screenBuffer[x] == nil or win.screenBuffer[x][y] == nil then error("position out of bounds: " .. x .. ", " .. y, 2) end
     win.screenBuffer[x][y].useCharacter = true
     win.screenBuffer[x][y].character = char
     redrawChar(win, x, y)
@@ -299,7 +300,7 @@ function drawCapture(win, x, y, image)
     for px=x,x+image.termWidth-1 do for py=y,y+image.termHeight-1 do 
         --print(px .. " " .. py)
         if image[px-x] == nil then error("no row at " .. px-x) end
-        if image[px-x][py-y] == nil then error("no data at " .. px-x .. ", " .. py-y) end
+        if image[px-x][py-y] == nil then error("no data at " .. px-x .. ", " .. py-y, 2) end
         win.screenBuffer[px][py] = image[px-x][py-y] end end
     redrawScreen(win)
 end

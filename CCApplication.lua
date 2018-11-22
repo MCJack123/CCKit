@@ -6,7 +6,7 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-if CCLog == nil then os.loadAPI(CCKitGlobals.CCKitDir.."/CCLog.lua") end
+loadAPI("CCLog")
 
 local colorString = "0123456789abcdef"
 
@@ -36,6 +36,7 @@ function CCApplication(name)
     retval.backgroundColor = colors.black
     retval.objectOrder = {}
     retval.applicationName = name
+    retval.showName = false
     if name ~= nil then retval.log = CCLog.CCLog(name)
     else retval.log = CCLog.default end
     CCLog.default.logToConsole = false
@@ -48,7 +49,10 @@ function CCApplication(name)
     end
     function retval:registerObject(win, name, up) -- adds the events in the object to the run loop
         --if win.class ~= "CCWindow" then error("tried to register non-CCWindow type " .. win.class, 2) end
-        if win == nil then error("win is nil", 2) end
+        if win == nil then 
+            self.log:error("win is nil") 
+            return
+        end
         if up == nil then up = true end
         if win.repaintColor ~= nil then win.repaintColor = self.backgroundColor end
         self.objects[name] = win
@@ -78,18 +82,27 @@ function CCApplication(name)
         while self.isApplicationRunning do
             --print("looking for event")
             if retval.objects.count == 0 then break end
+            if self.showName then
+                term.setBackgroundColor(self.backgroundColor)
+                term.setTextColor(colors.white)
+                term.setCursorPos(1, 1)
+                term.write(self.applicationName)
+            end
             local ev, p1, p2, p3, p4, p5 = os.pullEvent()
             --print("recieved event " .. ev)
             if ev == "closed_window" then
-                if retval.objects[p1] == nil then error("object is missing") end
-                drawFilledBox(retval.objects[p1].frame.x, retval.objects[p1].frame.y, retval.objects[p1].frame.width, retval.objects[p1].frame.height, self.backgroundColor)
-                retval.objects[p1] = nil
-                retval.objects.count = retval.objects.count - 1
-                if retval.objects.count == 0 then break end
-                local remove = {}
-                for k,v in pairs(self.events) do for l,w in pairs(v) do if w.self == p1 then table.insert(remove, {f = k, s = l}) end end end
-                for a,b in pairs(remove) do self.events[b.f][b.s] = nil end
-                for k,v in pairs(self.objectOrder) do if self.objects[v] ~= nil and self.objects[v].class == "CCWindow" and self.objects[v].window ~= nil then self.objects[v].window.redraw() end end
+                if retval.objects[p1] == nil or retval.objects[p1].class ~= "CCWindow" then 
+                    self.log:error("Missing window for " .. p1, "CCApplication")
+                else
+                    drawFilledBox(retval.objects[p1].frame.x, retval.objects[p1].frame.y, retval.objects[p1].frame.width, retval.objects[p1].frame.height, self.backgroundColor)
+                    retval.objects[p1] = nil
+                    retval.objects.count = retval.objects.count - 1
+                    if retval.objects.count == 0 then break end
+                    local remove = {}
+                    for k,v in pairs(self.events) do for l,w in pairs(v) do if w.self == p1 then table.insert(remove, {f = k, s = l}) end end end
+                    for a,b in pairs(remove) do self.events[b.f][b.s] = nil end
+                    for k,v in pairs(self.objectOrder) do if self.objects[v] ~= nil and self.objects[v].class == "CCWindow" and self.objects[v].window ~= nil then self.objects[v].window.redraw() end end 
+                end
             elseif ev == "redraw_window" then
                 if retval.objects[p1] ~= nil and retval.objects[p1].redraw ~= nil then retval.objects[p1]:redraw() end
             end
@@ -101,7 +114,7 @@ function CCApplication(name)
                 for l,w in pairs(v) do 
                     if self.objects[w.self] == nil then 
                         self.log:debug(textutils.serialize(w))
-                        self.log:error("Could not find object for " .. tostring(w.self), "CCApplication", 161)
+                        self.log:error("Could not find object for " .. tostring(w.self), "CCApplication")
                     else
                         if w.func(self.objects[w.self], p1, p2, p3, p4, p5) then 
                             redraws[w.self] = true

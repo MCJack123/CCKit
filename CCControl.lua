@@ -8,36 +8,11 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-os.loadAPI(CCKitGlobals.CCKitDir.."/CCEventHandler.lua")
-
-local function deepcopy(orig)
-    local orig_type = type(orig)
-    local copy
-    if orig_type == 'table' then
-        copy = {}
-        for orig_key, orig_value in next, orig, nil do
-            copy[deepcopy(orig_key)] = deepcopy(orig_value)
-        end
-        setmetatable(copy, deepcopy(getmetatable(orig)))
-    else -- number, string, boolean, etc
-        copy = orig
-    end
-    return copy
-end
-
-function table.combine(a, b)
-    if type(a) ~= "table" or type(b) ~= "table" then return nil end
-    local orig_type = type(b)
-    local copy = deepcopy(a)
-    for orig_key, orig_value in next, b, nil do
-        copy[deepcopy(orig_key)] = deepcopy(orig_value)
-    end
-    setmetatable(copy, deepcopy(getmetatable(b)))
-    return copy
-end
+local CCEventHandler = require("CCEventHandler")
+local CCView = require("CCView")
 
 function CCControl(x, y, width, height)
-    local retval = table.combine(CCView.CCView(x, y, width, height), CCEventHandler.CCEventHandler("CCControl"))
+    local retval = multipleInheritance(CCView(x, y, width, height), CCEventHandler("CCControl"))
     retval.hasEvents = true
     retval.isEnabled = true
     retval.isSelected = false
@@ -67,6 +42,7 @@ function CCControl(x, y, width, height)
         return false
     end
     function retval:onMouseUp(button, px, py)
+        -- TODO: Make sure only the top window gets clicked.
         if self.isSelected and button == 1 then 
             self.isSelected = false
             self:draw()

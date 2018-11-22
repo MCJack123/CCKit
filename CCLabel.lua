@@ -6,10 +6,11 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-os.loadAPI(CCKitGlobals.CCKitDir.."/CCView.lua")
+loadAPI("CCGraphics")
+local CCView = require("CCView")
 
 function CCLabel(x, y, text)
-    local retval = CCView.CCView(x, y, string.len(text), 1)
+    local retval = CCView(x, y, string.len(text), 1)
     retval.text = text
     retval.textColor = CCKitGlobals.defaultTextColor
     function retval:draw()

@@ -7,10 +7,10 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-os.loadAPI(CCKitGlobals.CCKitDir.."/CCControl.lua")
+local CCControl = require("CCControl")
 
 function CCButton(x, y, width, height)
-    local retval = CCControl.CCControl(x, y, width, height)
+    local retval = CCControl(x, y, width, height)
     retval.textColor = CCKitGlobals.defaultTextColor
     retval.text = nil
     retval.backgroundColor = CCKitGlobals.buttonColor

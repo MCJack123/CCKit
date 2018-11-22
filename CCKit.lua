@@ -7,39 +7,38 @@
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
 
-local function require(class)
-    local remove = true
-    if _G[class] ~= nil then remove = false
-    else os.loadAPI(CCKitGlobals.CCKitDir .. "/" .. class .. ".lua") end
-    local temp = _G[class]
-    if remove then os.unloadAPI(class) end
-    return temp[class]
-end
-
+CCAlertWindow = require("CCAlertWindow")
 CCApplication = require("CCApplication")
 CCButton = require("CCButton")
 CCCheckbox = require("CCCheckbox")
 CCControl = require("CCControl")
+CCEventHandler = require("CCEventHandler")
+loadAPI("CCGraphics")
 CCImageLoader = require("CCImageLoader")
-os.loadAPI(CCKitGlobals.CCKitDir .. "/CCImageType.lua")
+loadAPI("CCImageType")
 CCImageView = require("CCImageView")
 CCImageWriter = require("CCImageWriter")
 CCLabel = require("CCLabel")
-if CCLog == nil then os.loadAPI(CCKitGlobals.CCKitDir .. "/CCLog.lua") end
+loadAPI("CCLineBreakMode")
+loadAPI("CCLog")
 CCProgressBar = require("CCProgressBar")
+CCRadioButton = require("CCRadioButton")
+CCRadioGroup = require("CCRadioGroup")
 CCScrollView = require("CCScrollView")
 CCSlider = require("CCSlider")
+CCTextField = require("CCTextField")
 CCTextView = require("CCTextView")
 CCView = require("CCView")
 CCViewController = require("CCViewController")
 CCWindow = require("CCWindow")
 
-function CCMain(initX, initY, initWidth, initHeight, title, vcClass, backgroundColor, appName)
+function CCMain(initX, initY, initWidth, initHeight, title, vcClass, backgroundColor, appName, showName)
     backgroundColor = backgroundColor or colors.black
     local name = title
     if appName ~= nil then name = appName end
     local app = CCApplication(name)
     app:setBackgroundColor(backgroundColor)
+    app.showName = showName or false
     local win = CCWindow(initX, initY, initWidth, initHeight)
     win:setTitle(title)
     local vc = vcClass()

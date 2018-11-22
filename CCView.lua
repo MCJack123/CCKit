@@ -7,7 +7,7 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-if CCGraphics == nil then os.loadAPI(CCKitGlobals.CCKitDir.."/CCGraphics.lua") end
+loadAPI("CCGraphics")
 
 function CCView(x, y, width, height)
     local retval = {}
@@ -32,8 +32,8 @@ function CCView(x, y, width, height)
         end
     end
     function retval:addSubview(view)
-        if view == nil then error("Cannot add nil subview", 2) end
-        if self.application == nil then error("Application not found", 2) end
+        if self.application == nil then error("Parent view must be added before subviews", 2) end
+        if view == nil then self.application.log:error("Cannot add nil subview", 2) end
         if view.hasEvents then self.application:registerObject(view, view.name, false) end
         view:setParent(self.window, self.application, self.parentWindowName, self.frame.absoluteX, self.frame.absoluteY)
         table.insert(self.subviews, view)

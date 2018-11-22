@@ -7,8 +7,8 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-if CCGraphics == nil then os.loadAPI(CCKitGlobals.CCKitDir.."/CCGraphics.lua") end
-os.loadAPI(CCKitGlobals.CCKitDir.."/CCEventHandler.lua")
+loadAPI("CCGraphics")
+local CCEventHandler = require("CCEventHandler")
 
 -- Constants for the colors of the window
 
@@ -30,7 +30,7 @@ function string.random(length)
 end
 
 function CCWindow(x, y, width, height)
-    local retval = CCEventHandler.CCEventHandler("CCWindow")
+    local retval = CCEventHandler("CCWindow")
     retval.window = window.create(term.native(), x, y, width, height)
     retval.title = ""
     retval.frame = {}
@@ -77,6 +77,7 @@ function CCWindow(x, y, width, height)
             --self:redraw()
             self.frame.x = px - self.mouseOffset
             self.frame.y = py
+            if not CCKitGlobals.liveWindowMove then paintutils.drawBox(self.frame.x, self.frame.y, self.frame.x + self.frame.width - 1, self.frame.y + self.frame.height - 1, CCKitGlobals.windowBackgroundColor) end
             return true
         end
         return false
@@ -86,6 +87,7 @@ function CCWindow(x, y, width, height)
             if py == self.frame.y and px >= self.frame.x and px < self.frame.x + self.frame.width - 2 then 
                 self.isDragging = true 
                 self.mouseOffset = px - self.frame.x
+                self.window.setVisible(CCKitGlobals.liveWindowMove)
                 return true
             elseif py == self.frame.y and px == self.frame.x + self.frame.width - 2 and self.maximizable then
                 if self.maximized then
@@ -125,6 +127,7 @@ function CCWindow(x, y, width, height)
         if button == 1 and self.isDragging then 
             self:moveToPos(button, px, py) 
             self.isDragging = false
+            self.window.setVisible(true)
             return true
         end
         return false
@@ -156,6 +159,10 @@ function CCWindow(x, y, width, height)
     function retval:close()
         if self.viewController ~= nil then self.viewController:dismiss() end
         os.queueEvent("closed_window", self.name)
+    end
+    function retval:present(newwin)
+        newwin:redraw()
+        self.application:registerObject(newwin, newwin.name)
     end
     retval:addEvent("mouse_drag", retval.moveToPos)
     retval:addEvent("mouse_click", retval.startDrag)

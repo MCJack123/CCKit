@@ -28,6 +28,7 @@ function CCEventHandler(class)
     retval.name = string.random(8)
     retval.class = class
     retval.events = {}
+    retval.hasEvents = true -- for CCView compatibility
     function retval:addEvent(name, func)
         self.events[name] = {}
         self.events[name].func = func

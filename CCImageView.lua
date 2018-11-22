@@ -7,10 +7,11 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-os.loadAPI(CCKitGlobals.CCKitDir.."/CCView.lua")
+local CCView = require("CCView")
+loadAPI("CCGraphics")
 
 function CCImageView(x, y, image)
-    local retval = CCView.CCView(x, y, image.termWidth, image.termHeight)
+    local retval = CCView(x, y, image.termWidth, image.termHeight)
     retval.image = image
     function retval:draw()
         if self.parentWindow ~= nil then
