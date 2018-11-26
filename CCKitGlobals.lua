@@ -15,7 +15,7 @@ shouldDoubleRequire = true                     -- Whether loadAPI should load th
 titleBarColor = colors.yellow                  -- The color of the background of the title bar
 titleBarTextColor = colors.black               -- The color of the text of the title bar
 windowBackgroundColor = colors.white           -- The color of the background of a window
-liveWindowMove = false                         -- Whether to redraw window contents while moving or to only show the border (for speed)
+liveWindowMove = true                         -- Whether to redraw window contents while moving or to only show the border (for speed)
 
 -- Text views
 defaultTextColor = colors.black                -- The default color of text

@@ -10,6 +10,7 @@
 os.loadAPI("CCKit/CCKitGlobals.lua")
 local CCEventHandler = require("CCEventHandler")
 local CCView = require("CCView")
+loadAPI("CCWindowRegistry")
 
 function CCControl(x, y, width, height)
     local retval = multipleInheritance(CCView(x, y, width, height), CCEventHandler("CCControl"))
@@ -32,6 +33,7 @@ function CCControl(x, y, width, height)
         self:draw()
     end
     function retval:onMouseDown(button, px, py)
+        if not CCWindowRegistry.rayTest(self.application.objects[self.parentWindowName], px, py) then return false end
         local bx = self.frame.absoluteX
         local by = self.frame.absoluteY
         if px >= bx and py >= by and px < bx + self.frame.width and py < by + self.frame.height and button == 1 and self.action ~= nil and self.isEnabled then 
@@ -42,7 +44,7 @@ function CCControl(x, y, width, height)
         return false
     end
     function retval:onMouseUp(button, px, py)
-        -- TODO: Make sure only the top window gets clicked.
+        --if not CCWindowRegistry.rayTest(self.application.objects[self.parentWindowName], px, py) then return false end
         if self.isSelected and button == 1 then 
             self.isSelected = false
             self:draw()

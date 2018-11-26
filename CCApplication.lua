@@ -7,6 +7,8 @@
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
 loadAPI("CCLog")
+if _G._PID ~= nil then loadAPI("CCKernel") end
+loadAPI("CCWindowRegistry")
 
 local colorString = "0123456789abcdef"
 
@@ -26,9 +28,27 @@ local function drawFilledBox(x, y, endx, endy, color) for px=x,x+endx-1 do for p
     term.blit(" ", "0", cp(color)) 
 end end end
 
+local charset = {}
+
+-- qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890
+for i = 48,  57 do table.insert(charset, string.char(i)) end
+for i = 65,  90 do table.insert(charset, string.char(i)) end
+for i = 97, 122 do table.insert(charset, string.char(i)) end
+
+function string.random(length)
+  --math.randomseed(os.clock())
+
+  if length > 0 then
+    return string.random(length - 1) .. charset[math.random(1, #charset)]
+  else
+    return ""
+  end
+end
+
 function CCApplication(name)
     local retval = {}
     term.setBackgroundColor(colors.black)
+    retval.name = string.random(8)
     retval.class = "CCApplication"
     retval.objects = {count = 0}
     retval.events = {}
@@ -71,7 +91,7 @@ function CCApplication(name)
         --print(i)
     end
     function retval:deregisterObject(name)
-        retval.objects[name] = nil
+        self.objects[name] = nil
         local remove = {}
         for k,v in pairs(self.events) do for l,w in pairs(v) do if w.self == name then table.insert(remove, {f = k, s = l}) end end end
         for a,b in pairs(remove) do self.events[b.f][b.s] = nil end
@@ -79,9 +99,11 @@ function CCApplication(name)
     function retval:runLoop()
         --print("starting loop")
         self.log:open()
+        if _G.windowRegistry[self.name] == nil then CCWindowRegistry.registerApplication(self.name) end
+        if CCKernel ~= nil then CCKernel.broadcast("redraw_all", self.name, true) end
         while self.isApplicationRunning do
             --print("looking for event")
-            if retval.objects.count == 0 then break end
+            if self.objects.count == 0 then break end
             if self.showName then
                 term.setBackgroundColor(self.backgroundColor)
                 term.setTextColor(colors.white)
@@ -91,20 +113,26 @@ function CCApplication(name)
             local ev, p1, p2, p3, p4, p5 = os.pullEvent()
             --print("recieved event " .. ev)
             if ev == "closed_window" then
-                if retval.objects[p1] == nil or retval.objects[p1].class ~= "CCWindow" then 
+                if self.objects[p1] == nil or self.objects[p1].class ~= "CCWindow" then 
                     self.log:error("Missing window for " .. p1, "CCApplication")
                 else
-                    drawFilledBox(retval.objects[p1].frame.x, retval.objects[p1].frame.y, retval.objects[p1].frame.width, retval.objects[p1].frame.height, self.backgroundColor)
-                    retval.objects[p1] = nil
-                    retval.objects.count = retval.objects.count - 1
-                    if retval.objects.count == 0 then break end
+                    drawFilledBox(self.objects[p1].frame.x, self.objects[p1].frame.y, self.objects[p1].frame.width, self.objects[p1].frame.height, self.backgroundColor)
+                    CCWindowRegistry.setAppTop(self.name)
+                    CCWindowRegistry.deregisterWindow(self.objects[p1])
+                    if CCKernel ~= nil then CCKernel.broadcast("redraw_all", self.name) end
+                    self.objects[p1] = nil
+                    self.objects.count = self.objects.count - 1
+                    if self.objects.count == 0 then break end
                     local remove = {}
                     for k,v in pairs(self.events) do for l,w in pairs(v) do if w.self == p1 then table.insert(remove, {f = k, s = l}) end end end
                     for a,b in pairs(remove) do self.events[b.f][b.s] = nil end
                     for k,v in pairs(self.objectOrder) do if self.objects[v] ~= nil and self.objects[v].class == "CCWindow" and self.objects[v].window ~= nil then self.objects[v].window.redraw() end end 
                 end
             elseif ev == "redraw_window" then
-                if retval.objects[p1] ~= nil and retval.objects[p1].redraw ~= nil then retval.objects[p1]:redraw() end
+                if self.objects[p1] ~= nil and self.objects[p1].redraw ~= nil then self.objects[p1]:redraw() end
+            elseif ev == "redraw_all" then
+                if p1 ~= self.name then for k,v in pairs(self.objectOrder) do if self.objects[v] ~= nil and self.objects[v].class == "CCWindow" and self.objects[v].window ~= nil then self.objects[v]:redraw(false) end end
+                elseif p2 == true then CCWindowRegistry.setAppTop(self.name) end
             end
             local didEvent = false
             local redraws = {}
@@ -128,6 +156,7 @@ function CCApplication(name)
         end
         --print("ending loop")
         self.log:close()
+        CCWindowRegistry.deregisterApplication(self.name)
         coroutine.yield()
     end
     function retval:startRunLoop()
@@ -138,5 +167,6 @@ function CCApplication(name)
     function retval:stopRunLoop()
         self.isApplicationRunning = false
     end
+    CCWindowRegistry.registerApplication(retval.name)
     return retval
 end

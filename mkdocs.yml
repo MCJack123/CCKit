@@ -1,0 +1,39 @@
+site_name: CCKit
+theme: readthedocs
+extra_css:
+  - extra.css
+extra_javascript:
+  - extra.js
+nav:
+  - Home: index.md
+  - Conventions: Conventions.md
+  - Classes:
+    - CCAlertWindow: CCAlertWindow.md
+    - CCApplication: CCApplication.md
+    - CCButton: CCButton.md
+    - CCCheckbox: CCCheckbox.md
+    - CCControl: CCControl.md
+    - CCEventHandler: CCEventHandler.md
+    - CCImageLoader: CCImageLoader.md
+    - CCImageView: CCImageView.md
+    - CCImageWriter: CCImageWriter.md
+    - CCLabel: CCLabel.md
+    - CCLog (load as API): CCLog.md
+    - CCProgressBar: CCProgressBar.md
+    - CCRadioButton: CCRadioButton.md
+    - CCRadioGroup: CCRadioGroup.md
+    - CCScrollView: CCScrollView.md
+    - CCSlider: CCSlider.md
+    - CCTextField: CCTextField.md
+    - CCTextView: CCTextView.md
+    - CCView: CCView.md
+    - CCViewController: CCViewController.md
+    - CCWindow: CCWindow.md
+  - APIs:
+    - CCGraphics: CCGraphics.md
+    - CCImageType: CCImageType.md
+    - CCKernel: CCKernel.md
+    - CCKit: CCKit.md
+    - CCKitGlobals: CCKitGlobals.md
+    - CCLineBreakMode: CCLineBreakMode.md
+    - CCWindowRegistry: CCWindowRegistry.md

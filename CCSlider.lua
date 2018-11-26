@@ -9,6 +9,7 @@
 os.loadAPI("CCKit/CCKitGlobals.lua")
 local CCControl = require("CCControl")
 loadAPI("CCGraphics")
+loadAPI("CCWindowRegistry")
 
 function CCSlider(x, y, width)
     local retval = CCControl(x, y, width, 1)
@@ -25,6 +26,7 @@ function CCSlider(x, y, width)
         self:draw()
     end
     function retval:onMouseDown(button, px, py)
+        if not CCWindowRegistry.rayTest(self.application.objects[self.parentWindowName], px, py) then return false end
         local bx = self.frame.absoluteX
         local by = self.frame.absoluteY
         if px >= bx and py >= by and px < bx + self.frame.width and py < by + self.frame.height and button == 1 and self.isEnabled then 
@@ -35,6 +37,7 @@ function CCSlider(x, y, width)
         return false
     end
     function retval:onDrag(button, px, py)
+        --if not CCWindowRegistry.rayTest(self.application.objects[self.parentWindowName], px, py) then return false end
         if self.isSelected and button == 1 then
             if px < self.frame.absoluteX then self.sliderValue = 0
             elseif px > self.frame.absoluteX + self.frame.width - 1 then self.sliderValue = self.frame.width - 1

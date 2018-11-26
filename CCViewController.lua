@@ -20,7 +20,8 @@ function CCViewController()
         self.window = win
         self.application = app
         local width, height = win.window.getSize()
-        self.view = CCView(0, 1, width, height - 1)
+        if self.window.showTitleBar then self.view = CCView(0, 1, width, height - 1)
+        else self.view = CCView(0, 0, width, height) end
         self.view:setParent(self.window.window, self.application, self.window.name, self.window.frame.x, self.window.frame.y)
     end
     retval.superLoadView = retval.loadView

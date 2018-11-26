@@ -18,6 +18,7 @@ CCImageLoader = require("CCImageLoader")
 loadAPI("CCImageType")
 CCImageView = require("CCImageView")
 CCImageWriter = require("CCImageWriter")
+if _G._PID ~= nil then loadAPI("CCKernel") end
 CCLabel = require("CCLabel")
 loadAPI("CCLineBreakMode")
 loadAPI("CCLog")
@@ -31,8 +32,11 @@ CCTextView = require("CCTextView")
 CCView = require("CCView")
 CCViewController = require("CCViewController")
 CCWindow = require("CCWindow")
+loadAPI("CCWindowRegistry")
 
 function CCMain(initX, initY, initWidth, initHeight, title, vcClass, backgroundColor, appName, showName)
+    local forked = _FORK
+    if forked == nil then forked = false end
     backgroundColor = backgroundColor or colors.black
     local name = title
     if appName ~= nil then name = appName end
@@ -46,9 +50,13 @@ function CCMain(initX, initY, initWidth, initHeight, title, vcClass, backgroundC
     app:registerObject(win, win.name)
     app.isApplicationRunning = true
     term.setCursorBlink(false)
-    app:runLoop()
-    term.setBackgroundColor(colors.black)
-    term.clear()
-    term.setCursorPos(1, 1)
-    term.setCursorBlink(true)
+    pcall(function() app:runLoop() end)
+    CCWindowRegistry.deregisterApplication(app.name)
+    if not forked then
+        while table.maxn(_G.windowRegistry.zPos) > 0 do coroutine.yield() end
+        term.setBackgroundColor(colors.black)
+        term.clear()
+        term.setCursorPos(1, 1)
+        term.setCursorBlink(true)
+    end
 end

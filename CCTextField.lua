@@ -9,6 +9,7 @@ os.loadAPI("CCKit/CCKitGlobals.lua")
 local CCEventHandler = require("CCEventHandler")
 local CCView = require("CCView")
 loadAPI("CCGraphics")
+loadAPI("CCWindowRegistry")
 
 function CCTextField(x, y, width)
     local retval = multipleInheritance(CCView(x, y, width, 1), CCEventHandler("CCTextField"))
@@ -46,6 +47,7 @@ function CCTextField(x, y, width)
         end
     end
     function retval:onClick(button, px, py)
+        if not CCWindowRegistry.rayTest(self.application.objects[self.parentWindowName], px, py) then return false end
         if button == 1 then
             self.isSelected = px >= self.frame.absoluteX and py == self.frame.absoluteY and px < self.frame.absoluteX + self.frame.width and self.isEnabled
             self:draw()

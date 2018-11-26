@@ -1,6 +1,7 @@
 --if not os.loadAPI("CCKit/CCKitAmalgamated.lua") then error("could not load CCKit") end
 --CCKit = CCKitAmalgamated
 if not os.loadAPI("CCKit/CCKit.lua") then error("could not load CCKit") end
+if _G._PID ~= nil then loadAPI("CCKernel") end
 
 function MyViewController()
     local retval = multipleInheritance(CCKit.CCViewController(), CCKit.CCEventHandler("MyViewController"))
@@ -76,6 +77,13 @@ function MyViewController()
         local textBox = CCKit.CCTextField(24, 1, 10)
         textBox.placeholderText = "Text..."
         self.view:addSubview(textBox)
+
+        if CCKernel ~= nil then
+            local forkButton = CCKit.CCButton(24, 2, 10, 1)
+            forkButton.text = "Start New"
+            forkButton:setAction(CCKernel.exec, "/CCKit/applicationtest.lua")
+            self.view:addSubview(forkButton)
+        end
 
         self:addEvent("checkbox_toggled", self.toggle)
         self:addEvent("slider_dragged", self.dragged)

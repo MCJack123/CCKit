@@ -134,9 +134,13 @@ function CCLog(name)
             if erre == "bios.lua:610: " then break end
             local filename = string.sub(erre, 1, string.find(erre, ":")-1)
             if self.shell ~= nil then filename = self.shell.resolveProgram(filename) end
-            local lineno = tonumber(string.sub(erre, string.find(erre, ":")+1, string.find(erre, ":", string.find(erre, ":")+1)-1))
-            --if i == 4 then lineno=lineno-1 end
-            self.fileDescriptor.write("    at " .. erre .. string.trim(getLine(filename, lineno)) .. "\n")
+            if string.find(erre, ":") == nil or string.find(erre, ":", string.find(erre, ":")+1) == nil then
+                self.fileDescriptor.write("    at " .. erre .. "\n")
+            else
+                local lineno = tonumber(string.sub(erre, string.find(erre, ":")+1, string.find(erre, ":", string.find(erre, ":")+1)-1))
+                --if i == 4 then lineno=lineno-1 end
+                self.fileDescriptor.write("    at " .. erre .. string.trim(getLine(filename, lineno)) .. "\n")
+            end
             i=i+1
         end
         self.fileDescriptor.flush()
@@ -224,7 +228,8 @@ function default:critical(name, text, class, lineno)
 end
 function default:traceback(name, errortext, class, lineno)
     local i = 4
-    local statuse, erre = nil
+    local statuse = nil
+    local erre = "t"
     self:write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Traceback] " .. name .. ": ")
     if class ~= nil then 
         self:write(class)
@@ -232,14 +237,18 @@ function default:traceback(name, errortext, class, lineno)
         self:write(": ")
     end
     self:write(errortext .. "\n")
-    while erre ~= "bios.lua:610: " do
+    while erre ~= "" do
         statuse, erre = pcall(function() error("", i) end)
-        if erre == "bios.lua:610: " then break end
+        if erre == "" then break end
         local filename = string.sub(erre, 1, string.find(erre, ":")-1)
         if self.shell ~= nil then filename = self.shell.resolveProgram(filename) end
-        local lineno = tonumber(string.sub(erre, string.find(erre, ":")+1, string.find(erre, ":", string.find(erre, ":")+1)-1))
-        --if i == 4 then lineno=lineno-1 end
-        self:write("    at " .. erre .. string.trim(getLine(filename, lineno)) .. "\n")
+        if string.find(erre, ":", string.find(erre, ":")+1) == nil then
+            self:write("    at " .. erre .. "\n")
+        else
+            local lineno = tonumber(string.sub(erre, string.find(erre, ":")+1, string.find(erre, ":", string.find(erre, ":")+1)-1))
+            --if i == 4 then lineno=lineno-1 end
+            self:write("    at " .. erre .. string.trim(getLine(filename, lineno)) .. "\n")
+        end
         i=i+1
     end
     self.fileDescriptor.flush()

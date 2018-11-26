@@ -11,6 +11,7 @@ loadAPI("CCGraphics")
 local CCView = require("CCView")
 local CCEventHandler = require("CCEventHandler")
 local CCControl = require("CCControl")
+loadAPI("CCWindowRegistry")
 
 local function CCScrollBar(x, y, height) -- may make this public later
     local retval = CCControl(x, y, 1, height)
@@ -22,6 +23,7 @@ local function CCScrollBar(x, y, height) -- may make this public later
         self:draw()
     end
     function retval:onMouseDown(button, px, py)
+        if not CCWindowRegistry.rayTest(self.application.objects[self.parentWindowName], px, py) then return false end
         local bx = self.frame.absoluteX
         local by = self.frame.absoluteY
         if px >= bx and py >= by and px < bx + self.frame.width and py < by + self.frame.height and button == 1 and self.isEnabled then 
@@ -32,6 +34,7 @@ local function CCScrollBar(x, y, height) -- may make this public later
         return false
     end
     function retval:onDrag(button, px, py)
+        --if not CCWindowRegistry.rayTest(self.application.objects[self.parentWindowName], px, py) then return false end
         if self.isSelected and button == 1 then
             if py < self.frame.absoluteY then self.sliderValue = 0
             elseif py > self.frame.absoluteY + self.frame.height - 1 then self.sliderValue = self.frame.height - 1
@@ -128,6 +131,7 @@ function CCScrollView(x, y, width, height, innerHeight)
         end
     end
     function retval:scroll(direction, px, py)
+        if not CCWindowRegistry.rayTest(self.application.objects[self.parentWindowName], px, py) then return false end
         if px >= self.frame.absoluteX and py >= self.frame.absoluteY and px < self.frame.absoluteX + self.frame.width and py < self.frame.absoluteY + self.frame.height and self.currentOffset + direction <= self.contentHeight - self.frame.height and self.currentOffset + direction >= 0 then
             self.currentOffset = self.currentOffset + direction
             self:draw()
