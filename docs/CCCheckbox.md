@@ -1,6 +1,7 @@
 A view that can be toggled on and off.
 ## Constructor
 CCCheckbox(*number* x, *number* y[, *string* text]) <- [CCControl](CCControl.md)
+
 * x: The X position of the checkbox
 * y: The Y position of the checkbox
 * text: Optional, text to display next to the checkbox
