@@ -1,5 +1,6 @@
 # CCKit
-A UI library for Computercraft that is designed similar to UIKit.
+A UI library for Computercraft that is designed similar to UIKit.  
+This branch is for development for CCKitOS. It includes extra features that only work under CCKitOS.
 
 # Usage
 Copy this entire repository into a folder named `CCKit` at the root of your ComputerCraft computer. (You can `cd` to the computer root and `git clone` the repo.)

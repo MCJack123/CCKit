@@ -1,6 +1,7 @@
 A logging system for applications. Creates `CCLog.default` which is a global log that automatically combines all other `CCLog`s.
 ## Constructor
 CCLog(*string* name)
+
 * name: The name of the log file
 ## Properties
 * *boolean* showInDefaultLog: Whether to send messages to `CCLog.default`. Defaults to `true`.
@@ -37,7 +38,7 @@ When this API is loaded, a default logger is created that logs to `CCKit/logs/de
 Any messages sent here will automatically be sent to the terminal window. Also, all loggers that are created will automatically send their messages to the default logger, unless `showInDefaultLog` is set to `false`.  
 There are a few differences between a `CCLog` and the default log:
 
-* There is no `showInDefaultLog` property.
+* There is no `showInDefaultLog` property, since this is the default log.
 * A new property takes its place: `logToConsole`, which enables or disables outputting messages to the console.
 * The log is automatically opened, so there's no need to open it after loading the API.
 * All logging functions require an extra argument before `text`: the name of the caller, used to differentiate between programs/APIs.

@@ -7,7 +7,7 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-loadAPI("CCLog")
+local CCLog = require("CCLog")
 
 kernel_running = true
 
@@ -25,7 +25,7 @@ function main(first_program, ...)
         os.nativeQueueEvent(ev, "CustomEvent,PID=" .. _G._PID, ...)
     end
     _ENV.process_table = {}
-    local log = CCLog.CCLog("CCKernel")
+    local log = CCLog("CCKernel")
     log:open()
     CCLog.default.logToConsole = false
     local oldPath = shell.path()

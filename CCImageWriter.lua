@@ -7,7 +7,7 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-loadAPI("CCLog")
+local CCLog = require("CCLog")
 loadAPI("CCImageType")
 
 local colorString = "0123456789abcdef"

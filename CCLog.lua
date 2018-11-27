@@ -24,7 +24,7 @@ end
 
 -- this doesn't account for leap years, but that doesn't matter in Minecraft
 local junOff = 31 + 28 + 31 + 30 + 31 + 30
-function dayToString(day)
+local function dayToString(day)
     if day <= 31 then return "Jan " .. day
     elseif day > 31 and day <= 31 + 28 then return "Feb " .. day - 31
     elseif day > 31 + 28 and day <= 31 + 28 + 31 then return "Mar " .. day - 31 - 28
@@ -39,7 +39,114 @@ function dayToString(day)
     else return "Dec " .. day - junOff - 31 - 31 - 30 - 31 - 30 end
 end
 
-function CCLog(name)
+CCLog = {}
+
+CCLog.default = {}
+CCLog.default.fileDescriptor = nil
+CCLog.default.shell = nil
+CCLog.default.logToConsole = true
+
+function CCLog.default:open()
+    if self.fileDescriptor == nil then
+        self.fileDescriptor = fs.open("CCKit/logs/default.log", fs.exists("CCKit/logs/default.log") and "a" or "w")
+        self.fileDescriptor.write("=== Logging started at " .. dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " ===\n")
+        self.fileDescriptor.flush()
+    end
+end
+function CCLog.default:write(text)
+    self.fileDescriptor.write(text)
+    if self.logToConsole then
+        local lastColor = term.getTextColor()
+        term.setTextColor(colors.red)
+        write(text) 
+        term.setTextColor(lastColor)
+    end
+end
+function CCLog.default:debug(name, text, class, lineno)
+    self:write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Debug] " .. name .. ": ")
+    if class ~= nil then 
+        self:write(class)
+        if lineno ~= nil then self:write("[" .. lineno .. "]") end
+        self:write(": ")
+    end
+    self:write(text .. "\n")
+    self.fileDescriptor.flush()
+end
+function CCLog.default:log(name, text, class, lineno)
+    self:write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Default] " .. name .. ": ")
+    if class ~= nil then 
+        self:write(class)
+        if lineno ~= nil then self:write("[" .. lineno .. "]") end
+        self:write(": ")
+    end
+    self:write(text .. "\n")
+    self.fileDescriptor.flush()
+end
+function CCLog.default:warn(name, text, class, lineno)
+    self:write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Warning] " .. name .. ": ")
+    if class ~= nil then 
+        self:write(class)
+        if lineno ~= nil then self:write("[" .. lineno .. "]") end
+        self:write(": ")
+    end
+    self:write(text .. "\n")
+    self.fileDescriptor.flush()
+end
+function CCLog.default:error(name, text, class, lineno)
+    self:write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Error] " .. name .. ": ")
+    if class ~= nil then 
+        self:write(class)
+        if lineno ~= nil then self:write("[" .. lineno .. "]") end
+        self:write(": ")
+    end
+    self:write(text .. "\n")
+    self.fileDescriptor.flush()
+end
+function CCLog.default:critical(name, text, class, lineno)
+    self:write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Critical] " .. name .. ": ")
+    if class ~= nil then 
+        self:write(class)
+        if lineno ~= nil then self:write("[" .. lineno .. "]") end
+        self:write(": ")
+    end
+    self:write(text .. "\n")
+    self.fileDescriptor.flush()
+end
+function CCLog.default:traceback(name, errortext, class, lineno)
+    local i = 4
+    local statuse = nil
+    local erre = "t"
+    self:write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Traceback] " .. name .. ": ")
+    if class ~= nil then 
+        self:write(class)
+        if lineno ~= nil then self:write("[" .. lineno .. "]") end
+        self:write(": ")
+    end
+    self:write(errortext .. "\n")
+    while erre ~= "" do
+        statuse, erre = pcall(function() error("", i) end)
+        if erre == "" then break end
+        local filename = string.sub(erre, 1, string.find(erre, ":")-1)
+        if self.shell ~= nil then filename = self.shell.resolveProgram(filename) end
+        if string.find(erre, ":", string.find(erre, ":")+1) == nil then
+            self:write("    at " .. erre .. "\n")
+        else
+            local lineno = tonumber(string.sub(erre, string.find(erre, ":")+1, string.find(erre, ":", string.find(erre, ":")+1)-1))
+            --if i == 4 then lineno=lineno-1 end
+            self:write("    at " .. erre .. string.trim(getLine(filename, lineno)) .. "\n")
+        end
+        i=i+1
+    end
+    self.fileDescriptor.flush()
+end
+function CCLog.default:close()
+    self.fileDescriptor.close()
+    self.fileDescriptor = nil
+end
+
+CCLog.default:open()
+
+setmetatable(CCLog, {__call = function(idontneedthis, name)
     local retval = {}
     retval.name = name
     retval.fileDescriptor = nil
@@ -47,7 +154,8 @@ function CCLog(name)
     retval.shell = nil
     function retval:open()
         if self.fileDescriptor == nil then
-            self.fileDescriptor = fs.open("CCKit/logs/" .. retval.name .. ".log", fs.exists("CCKit/logs/" .. retval.name .. ".log") and "a" or "w")
+            if type(self.name) == "table" then textutils.pagedPrint(textutils.serialize(self)) end
+            self.fileDescriptor = fs.open("CCKit/logs/" .. self.name .. ".log", fs.exists("CCKit/logs/" .. self.name .. ".log") and "a" or "w")
             if self.fileDescriptor == nil then error("Could not open log file") end
             self.fileDescriptor.write("=== Logging for " .. name .. " started at " .. dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " ===\n")
             self.fileDescriptor.flush()
@@ -64,7 +172,7 @@ function CCLog(name)
         self.fileDescriptor.write(text .. "\n")
         self.fileDescriptor.flush()
         if (self.showInDefaultLog) then 
-            default:debug(self.name, text, class, lineno) 
+            CCLog.default:debug(self.name, text, class, lineno) 
         end
     end
     function retval:log(text, class, lineno)
@@ -77,7 +185,7 @@ function CCLog(name)
         self.fileDescriptor.write(text .. "\n")
         self.fileDescriptor.flush()
         if (self.showInDefaultLog) then 
-            default:log(self.name, text, class, lineno) 
+            CCLog.default:log(self.name, text, class, lineno) 
         end
     end
     function retval:warn(text, class, lineno)
@@ -90,7 +198,7 @@ function CCLog(name)
         self.fileDescriptor.write(text .. "\n")
         self.fileDescriptor.flush()
         if (self.showInDefaultLog) then 
-            default:warn(self.name, text, class, lineno) 
+            CCLog.default:warn(self.name, text, class, lineno) 
         end
     end
     function retval:error(text, class, lineno)
@@ -103,7 +211,7 @@ function CCLog(name)
         self.fileDescriptor.write(text .. "\n")
         self.fileDescriptor.flush()
         if (self.showInDefaultLog) then 
-            default:error(self.name, text, class, lineno) 
+            CCLog.default:error(self.name, text, class, lineno) 
         end
     end
     function retval:critical(text, class, lineno)
@@ -116,7 +224,7 @@ function CCLog(name)
         self.fileDescriptor.write(text .. "\n")
         self.fileDescriptor.flush()
         if (self.showInDefaultLog) then 
-            default:critical(self.name, text, class, lineno) 
+            CCLog.default:critical(self.name, text, class, lineno) 
         end
     end
     function retval:traceback(errortext, class, lineno)
@@ -145,7 +253,7 @@ function CCLog(name)
         end
         self.fileDescriptor.flush()
         if (self.showInDefaultLog) then 
-            default:traceback(self.name, errortext, class, lineno) 
+            CCLog.default:traceback(self.name, errortext, class, lineno) 
         end
     end
     function retval:close()
@@ -153,109 +261,4 @@ function CCLog(name)
         self.fileDescriptor = nil
     end
     return retval
-end
-
-default = {}
-default.fileDescriptor = nil
-default.shell = nil
-default.logToConsole = true
-
-function default:open()
-    if default.fileDescriptor == nil then
-        default.fileDescriptor = fs.open("CCKit/logs/default.log", fs.exists("CCKit/logs/default.log") and "a" or "w")
-        default.fileDescriptor.write("=== Logging started at " .. dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " ===\n")
-        default.fileDescriptor.flush()
-    end
-end
-function default:write(text)
-    self.fileDescriptor.write(text)
-    if self.logToConsole then
-        local lastColor = term.getTextColor()
-        term.setTextColor(colors.red)
-        write(text) 
-        term.setTextColor(lastColor)
-    end
-end
-function default:debug(name, text, class, lineno)
-    self:write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Debug] " .. name .. ": ")
-    if class ~= nil then 
-        self:write(class)
-        if lineno ~= nil then self:write("[" .. lineno .. "]") end
-        self:write(": ")
-    end
-    self:write(text .. "\n")
-    self.fileDescriptor.flush()
-end
-function default:log(name, text, class, lineno)
-    self:write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Default] " .. name .. ": ")
-    if class ~= nil then 
-        self:write(class)
-        if lineno ~= nil then self:write("[" .. lineno .. "]") end
-        self:write(": ")
-    end
-    self:write(text .. "\n")
-    self.fileDescriptor.flush()
-end
-function default:warn(name, text, class, lineno)
-    self:write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Warning] " .. name .. ": ")
-    if class ~= nil then 
-        self:write(class)
-        if lineno ~= nil then self:write("[" .. lineno .. "]") end
-        self:write(": ")
-    end
-    self:write(text .. "\n")
-    self.fileDescriptor.flush()
-end
-function default:error(name, text, class, lineno)
-    self:write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Error] " .. name .. ": ")
-    if class ~= nil then 
-        self:write(class)
-        if lineno ~= nil then self:write("[" .. lineno .. "]") end
-        self:write(": ")
-    end
-    self:write(text .. "\n")
-    self.fileDescriptor.flush()
-end
-function default:critical(name, text, class, lineno)
-    self:write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Critical] " .. name .. ": ")
-    if class ~= nil then 
-        self:write(class)
-        if lineno ~= nil then self:write("[" .. lineno .. "]") end
-        self:write(": ")
-    end
-    self:write(text .. "\n")
-    self.fileDescriptor.flush()
-end
-function default:traceback(name, errortext, class, lineno)
-    local i = 4
-    local statuse = nil
-    local erre = "t"
-    self:write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Traceback] " .. name .. ": ")
-    if class ~= nil then 
-        self:write(class)
-        if lineno ~= nil then self:write("[" .. lineno .. "]") end
-        self:write(": ")
-    end
-    self:write(errortext .. "\n")
-    while erre ~= "" do
-        statuse, erre = pcall(function() error("", i) end)
-        if erre == "" then break end
-        local filename = string.sub(erre, 1, string.find(erre, ":")-1)
-        if self.shell ~= nil then filename = self.shell.resolveProgram(filename) end
-        if string.find(erre, ":", string.find(erre, ":")+1) == nil then
-            self:write("    at " .. erre .. "\n")
-        else
-            local lineno = tonumber(string.sub(erre, string.find(erre, ":")+1, string.find(erre, ":", string.find(erre, ":")+1)-1))
-            --if i == 4 then lineno=lineno-1 end
-            self:write("    at " .. erre .. string.trim(getLine(filename, lineno)) .. "\n")
-        end
-        i=i+1
-    end
-    self.fileDescriptor.flush()
-end
-function default:close()
-    self.fileDescriptor.close()
-    self.fileDescriptor = nil
-end
-
-default:open()
+end})

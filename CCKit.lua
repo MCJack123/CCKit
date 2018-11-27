@@ -21,7 +21,7 @@ CCImageWriter = require("CCImageWriter")
 if _G._PID ~= nil then loadAPI("CCKernel") end
 CCLabel = require("CCLabel")
 loadAPI("CCLineBreakMode")
-loadAPI("CCLog")
+CCLog = loadAPI("CCLog")
 CCProgressBar = require("CCProgressBar")
 CCRadioButton = require("CCRadioButton")
 CCRadioGroup = require("CCRadioGroup")

@@ -6,7 +6,7 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-loadAPI("CCLog")
+local CCLog = require("CCLog")
 if _G._PID ~= nil then loadAPI("CCKernel") end
 loadAPI("CCWindowRegistry")
 
@@ -57,7 +57,8 @@ function CCApplication(name)
     retval.objectOrder = {}
     retval.applicationName = name
     retval.showName = false
-    if name ~= nil then retval.log = CCLog.CCLog(name)
+    if type(name) == "table" then error("Name is a table") end
+    if name ~= nil then retval.log = CCLog(name)
     else retval.log = CCLog.default end
     CCLog.default.logToConsole = false
     retval.log:open()
