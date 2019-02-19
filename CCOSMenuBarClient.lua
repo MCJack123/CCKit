@@ -58,6 +58,8 @@ function CCOSMenuBarClient(application)
     end
     function retval:updateServer()
         if self.menuBarPID == 0 then return end
+        --print("Updating")
+        --print(textutils.serialize(self.menuEntries.order))
         CCKernel.send(self.menuBarPID, "menu_bar_update", self.application.name, self.menuEntries)
     end
     retval:searchForServer()

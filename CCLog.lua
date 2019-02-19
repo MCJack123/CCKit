@@ -262,3 +262,5 @@ setmetatable(CCLog, {__call = function(idontneedthis, name)
     end
     return retval
 end})
+
+return CCLog

@@ -8,8 +8,8 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCEventHandler = require("CCEventHandler")
-local CCView = require("CCView")
+local CCEventHandler = CCRequire("CCEventHandler")
+local CCView = CCRequire("CCView")
 loadAPI("CCWindowRegistry")
 
 function CCControl(x, y, width, height)
@@ -33,7 +33,10 @@ function CCControl(x, y, width, height)
         self:draw()
     end
     function retval:onMouseDown(button, px, py)
-        if not CCWindowRegistry.rayTest(self.application.objects[self.parentWindowName], px, py) then return false end
+        if not CCWindowRegistry.rayTest(self.application.objects[self.parentWindowName], px, py) and _G.windowRegistry[self.application.objects[self.parentWindowName]] ~= nil then 
+            --print("No ray test")
+            return false 
+        end
         local bx = self.frame.absoluteX
         local by = self.frame.absoluteY
         if px >= bx and py >= by and px < bx + self.frame.width and py < by + self.frame.height and button == 1 and self.action ~= nil and self.isEnabled then 

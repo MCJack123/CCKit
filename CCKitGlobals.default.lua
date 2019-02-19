@@ -29,5 +29,5 @@ buttonDisabledColor = colors.lightGray         -- The color of a disabled button
 buttonDisabledTextColor = colors.gray          -- The color of the text in a disabled button
 
 -- Include some global functions
-if require == nil then os.loadAPI(CCKitDir.."/CCKitGlobalFunctions.lua")
+if multipleInheritance == nil then os.loadAPI(CCKitDir.."/CCKitGlobalFunctions.lua")
 for k,v in pairs(CCKitGlobalFunctions) do _G[k] = CCKitGlobalFunctions[k] end end

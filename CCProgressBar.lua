@@ -8,7 +8,7 @@
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
 loadAPI("CCGraphics")
-local CCView = require("CCView")
+local CCView = CCRequire("CCView")
 
 function CCProgressBar(x, y, width)
     local retval = CCView(x, y, width, 1)

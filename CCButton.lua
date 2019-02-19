@@ -7,7 +7,7 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCControl = require("CCControl")
+local CCControl = CCRequire("CCControl")
 
 function CCButton(x, y, width, height)
     local retval = CCControl(x, y, width, height)

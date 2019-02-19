@@ -8,7 +8,7 @@
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
 loadAPI("CCGraphics")
-local CCEventHandler = require("CCEventHandler")
+local CCEventHandler = CCRequire("CCEventHandler")
 if _G._PID ~= nil then loadAPI("CCKernel") end
 loadAPI("CCWindowRegistry")
 
@@ -33,7 +33,7 @@ end
 
 function CCWindow(x, y, width, height)
     local retval = CCEventHandler("CCWindow")
-    retval.window = window.create(term.native(), x, y, width, height)
+    retval.window = window.create(term.current(), x, y, width, height)
     retval.title = ""
     retval.frame = {}
     retval.frame.x = x
@@ -107,7 +107,7 @@ function CCWindow(x, y, width, height)
     end
     function retval:startDrag(button, px, py)
         if not CCWindowRegistry.rayTest(self, px, py) then return false end
-        if button == 1 then
+        if button == 1 and self.showTitleBar then
             if not CCWindowRegistry.isWinOnTop(self) or not CCWindowRegistry.isAppOnTop(self.application.name) then 
                 self:redraw() 
                 CCWindowRegistry.setAppTop(self.application.name)
@@ -185,7 +185,7 @@ function CCWindow(x, y, width, height)
     end
     function retval:setTitle(str)
         self.title = str
-        CCGraphics.setString(self.window, math.floor((self.frame.width - string.len(str)) / 2), 0, str)
+        if self.showTitleBar then CCGraphics.setString(self.window, math.floor((self.frame.width - string.len(str)) / 2), 0, str) end
     end
     function retval:setViewController(vc, app)
         self.viewController = vc
@@ -202,8 +202,8 @@ function CCWindow(x, y, width, height)
         end
     end
     function retval:close()
-        if self.viewController ~= nil then self.viewController:dismiss() end
-        os.queueEvent("closed_window", self.name)
+        if self.viewController ~= nil then self.viewController:dismiss()
+        else os.queueEvent("closed_window", self.name) end
     end
     function retval:present(newwin)
         newwin:redraw()

@@ -7,7 +7,7 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCControl = require("CCControl")
+local CCControl = CCRequire("CCControl")
 loadAPI("CCGraphics")
 
 function CCRadioButton(x, y, text)

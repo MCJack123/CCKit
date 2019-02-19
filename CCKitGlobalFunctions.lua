@@ -39,7 +39,7 @@ function multipleInheritance(...)
     return retval
 end
 
-function require(class)
+function CCRequire(class)
     local remove = true
     if _G[class] ~= nil and type(_G[class]) == "function" then remove = false
     else os.loadAPI(CCKitGlobals.CCKitDir .. "/" .. class .. ".lua") end
@@ -50,7 +50,7 @@ end
 
 function loadAPI(class)
     if _G[class] ~= nil and not CCKitGlobals.shouldDoubleRequire then return end
-    os.loadAPI(CCKitGlobals.CCKitDir .. "/" .. class .. ".lua")
+    return os.loadAPI(CCKitGlobals.CCKitDir .. "/" .. class .. ".lua")
 end
 
 -- Better serialize

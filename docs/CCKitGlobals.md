@@ -17,7 +17,7 @@ This file **MUST** be placed at `/CCKit/CCKitGlobals.lua` for the other classes 
 
 ## Global Functions
 These functions are available at the global scope and are not addressed in CCKitGlobals.
-* *function* require(*string* class): Returns the constructor for a class.
+* *function* CCRequire(*string* class): Returns the constructor for a class.
     * class: The name of the class
     * Returns: The constructor of the class
 * *nil* loadAPI(*string* class): Loads a CCKit API from CCKitDir.

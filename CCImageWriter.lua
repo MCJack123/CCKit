@@ -7,7 +7,7 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCLog = require("CCLog")
+local CCLog = CCRequire("CCLog")
 loadAPI("CCImageType")
 
 local colorString = "0123456789abcdef"
@@ -50,6 +50,18 @@ function CCImageWriter()
     function retval:open(file)
         self.fileHandle = fs.open(file, "w")
         if self.fileHandle == nil then return -1 end
+        self.isOpen = true
+        self.fileName = file
+        if string.find(file, ".ccg") ~= nil or string.find(file, ".lon") ~= nil then self.type = CCImageType.ccg
+        elseif string.find(file, ".nfp") ~= nil then self.type = CCImageType.nfp
+        elseif string.find(file, ".nft") ~= nil then self.type = CCImageType.nft
+        elseif string.find(file, ".blt") ~= nil then self.type = CCImageType.blt
+        elseif string.find(file, ".gif") ~= nil then self.type = CCImageType.gif
+        else return 1 end
+        return 0
+    end
+    function setHandle(handle, file)
+        self.fileHandle = handle
         self.isOpen = true
         self.fileName = file
         if string.find(file, ".ccg") ~= nil or string.find(file, ".lon") ~= nil then self.type = CCImageType.ccg

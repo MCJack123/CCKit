@@ -7,7 +7,7 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCControl = require("CCControl")
+local CCControl = CCRequire("CCControl")
 
 function CCCheckbox(x, y, text)
     local size = 1

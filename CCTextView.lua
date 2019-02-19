@@ -6,7 +6,7 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCView = require("CCView")
+local CCView = CCRequire("CCView")
 loadAPI("CCLineBreakMode")
 loadAPI("CCGraphics")
 

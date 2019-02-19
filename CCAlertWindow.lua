@@ -7,10 +7,10 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCButton = require("CCButton")
-local CCTextView = require("CCTextView")
-local CCViewController = require("CCViewController")
-local CCWindow = require("CCWindow")
+local CCButton = CCRequire("CCButton")
+local CCTextView = CCRequire("CCTextView")
+local CCViewController = CCRequire("CCViewController")
+local CCWindow = CCRequire("CCWindow")
 
 local function AlertViewController(w, h, text)
     local retval = CCViewController()

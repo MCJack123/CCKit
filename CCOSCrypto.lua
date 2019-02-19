@@ -1,4 +1,14 @@
+-- CCOSCrypto
+-- CCKitOS
+--
+-- This file defines various functions for encrypting and decrypting data, as
+-- well as hashing data. Note that the encryption functions require an internet
+-- connection, as all encryption occurs on a server.
+--
+-- Copyright (c) 2018 JackMacWindows.
 
+
+-- These functions are for SHA-256 hashing.
 --  
 --  Adaptation of the Secure Hashing Algorithm (SHA-244/256)
 --  Found Here: http://lua-users.org/wiki/SecureHashAlgorithm
@@ -9,6 +19,7 @@
 
 local MOD = 2^32
 local MODM = MOD-1
+local function assert(condition, err) if not condition then error(err, 3) end end
 
 local function memoize(f)
 	local mt = {}
@@ -189,4 +200,32 @@ function sha256(msg)
 	for i = 1, #msg, 64 do digestblock(msg, i, H) end
 	return str2hexa(num2s(H[1], 4) .. num2s(H[2], 4) .. num2s(H[3], 4) .. num2s(H[4], 4) ..
 		num2s(H[5], 4) .. num2s(H[6], 4) .. num2s(H[7], 4) .. num2s(H[8], 4))
+end
+
+-- These functions are for encryption and decryption.
+
+local endpoint = "http://cppconsole.bruienne.com/crypto/index.php"
+
+function encrypt(plaintext, private_key)
+    local fh = http.post(endpoint, "mode=1&key="..private_key.."&plaintext="..plaintext)
+    if fh == nil then return nil end
+    local retval = fh.readAll()
+    fh.close()
+    return retval
+end
+
+function decrypt(enctext, public_key)
+    local fh = http.post(endpoint, "mode=2&key="..public_key.."&enctext="..enctext)
+    if fh == nil then return nil end
+    local retval = fh.readAll()
+    fh.close()
+    return retval
+end
+
+function generateKeys()
+    local fh = http.post(endpoint, "mode=3")
+    if fh == nil then return nil end
+    local retval = textutils.unserialize(fh.readAll())
+    fh.close()
+    return retval
 end

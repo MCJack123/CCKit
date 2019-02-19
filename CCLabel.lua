@@ -7,7 +7,7 @@
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
 loadAPI("CCGraphics")
-local CCView = require("CCView")
+local CCView = CCRequire("CCView")
 
 function CCLabel(x, y, text)
     local retval = CCView(x, y, string.len(text), 1)

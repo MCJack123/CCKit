@@ -7,8 +7,8 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCView = require("CCView")
-local CCEventHandler = require("CCEventHandler")
+local CCView = CCRequire("CCView")
+local CCEventHandler = CCRequire("CCEventHandler")
 
 function CCRadioGroup(x, y, width, height)
     local retval = multipleInheritance(CCView(x, y, width, height), CCEventHandler("CCRadioGroup"))

@@ -8,7 +8,7 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCView = require("CCView")
+local CCView = CCRequire("CCView")
 
 function CCViewController()
     local retval = {}
@@ -28,10 +28,16 @@ function CCViewController()
     function retval:viewDidLoad()
         -- override this to create custom subviews
     end
+    function retval:viewWillDisappear()
+        -- override this to run code before the view unloads
+    end
     function retval:dismiss()
+        self:viewWillDisappear()
+        if self.events ~= nil then self.application:deregisterObject(self.name) end
         if self.view.subviews ~= nil then
             for k,v in pairs(self.view.subviews) do self.view:deregisterSubview(v) end
         end
+        os.queueEvent("closed_window", self.window.name)
     end
     return retval
 end

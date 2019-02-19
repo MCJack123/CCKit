@@ -7,7 +7,7 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCLog = require("CCLog")
+local CCLog = CCRequire("CCLog")
 
 kernel_running = true
 
@@ -25,6 +25,7 @@ function main(first_program, ...)
         os.nativeQueueEvent(ev, "CustomEvent,PID=" .. _G._PID, ...)
     end
     _ENV.process_table = {}
+    --print(tostring(CCLog))
     local log = CCLog("CCKernel")
     log:open()
     CCLog.default.logToConsole = false
@@ -73,7 +74,9 @@ function main(first_program, ...)
         elseif e[1] == "kcall_start_process" then
             table.remove(e, 1)
             local path = table.remove(e, 1)
-            table.insert(process_table, {coro=coroutine.create(os.run), path=path, started=false, filter=nil, args=e})
+            local env = {}
+            if type(e[1]) == "table" then env = table.remove(e, 1) end
+            table.insert(process_table, {coro=coroutine.create(os.run), path=path, started=false, filter=nil, args=e, env=env})
         else
             local delete = {}
             for k,v in pairs(process_table) do
@@ -84,13 +87,17 @@ function main(first_program, ...)
                         if PID == 0 or PID == k then
                             _G._PID = k
                             _G._FORK = false
+                            if v.env ~= nil then for r,n in pairs(v.env) do _G[r] = n end end
                             err, res = coroutine.resume(v.coro, unpack(e))
+                            if v.env ~= nil then for r,n in pairs(v.env) do _G[r] = nil end end
                         end
                     else
                         log:log("Starting process", basename(v.path), k)
                         _G._PID = k
                         _G._FORK = true -- only check this before first yield
+                        if v.env ~= nil then for r,n in pairs(v.env) do _G[r] = n end end
                         err, res = coroutine.resume(v.coro, _ENV, v.path, unpack(v.args))
+                        if v.env ~= nil then for r,n in pairs(v.env) do _G[r] = nil end end
                         v.started = true
                     end
                     if not err then
@@ -115,7 +122,7 @@ function main(first_program, ...)
     print("CCKernel is no longer active.")
 end
 
-function exec(path, ...)
+function exec(path, --[[env,]] ...)
     --print(tostring(_G._PID))
     if _G._PID ~= nil then 
         _G._PID = _G._PID

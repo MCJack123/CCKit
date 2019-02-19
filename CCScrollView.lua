@@ -8,9 +8,9 @@
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
 loadAPI("CCGraphics")
-local CCView = require("CCView")
-local CCEventHandler = require("CCEventHandler")
-local CCControl = require("CCControl")
+local CCView = CCRequire("CCView")
+local CCEventHandler = CCRequire("CCEventHandler")
+local CCControl = CCRequire("CCControl")
 loadAPI("CCWindowRegistry")
 
 local function CCScrollBar(x, y, height) -- may make this public later

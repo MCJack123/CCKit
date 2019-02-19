@@ -1,7 +1,7 @@
 --if not os.loadAPI("CCKit/CCKitAmalgamated.lua") then error("could not load CCKit") end
 --CCKit = CCKitAmalgamated
-if not os.loadAPI("CCKit/CCKit.lua") then error("could not load CCKit") end
-if _G._PID ~= nil then loadAPI("CCKernel") end
+if not os.loadAPI("CCKit/CCKitGlobals.lua") then error("could not load CCKitGlobals") end
+if not loadAPI("CCOSKit") then error("could not load CCOSKit") end
 
 function MyViewController()
     local retval = multipleInheritance(CCKit.CCViewController(), CCKit.CCEventHandler("MyViewController"))
@@ -26,12 +26,18 @@ function MyViewController()
         return false
     end
     function retval:alert()
+        self.application.menuBarClient:updateServer()
         local newwin = CCKit.CCAlertWindow(20, 5, 20, 8, "Alert", "This is a long string of text to test if the text view works right.", self.application)
         self.window:present(newwin)
     end
     function retval:viewDidLoad()
+        self.application.menuBarClient = CCOSKit.CCOSMenuBarClient(self.application)
+        self.application.menuBarClient:addMenu("Menu")
+        self.application.menuBarClient:addAction("Menu", "Open Alert", self.alert, self)
         local loader = CCKit.CCImageLoader()
-        local res = loader:open("CCKit/testimage.lon")
+        local res
+        if _G._bundlePath ~= nil then res = loader:setHandle(CCOSKit.CCOSBundle.current():openResource("testimage.lon"))
+        else res = loader:open("CCKit/testimage.lon") end
         if res == 1 then loader.type = CCImageType.ccg
         elseif res == -1 then self.application.log:error("Could not open image file") end
         local image = loader:read()
@@ -81,7 +87,9 @@ function MyViewController()
         if CCKernel ~= nil then
             local forkButton = CCKit.CCButton(24, 2, 10, 1)
             forkButton.text = "Start New"
-            forkButton:setAction(CCKernel.exec, "/CCKit/applicationtest.lua")
+            local target = "/CCKit/applicationtest.lua"
+            if _G._bundlePath ~= nil then target = CCOSKit.CCOSBundle.current().path .. "/Executables/applicationtest.lua" end
+            forkButton:setAction(CCKernel.exec, target)
             self.view:addSubview(forkButton)
         end
 

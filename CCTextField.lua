@@ -6,8 +6,8 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCEventHandler = require("CCEventHandler")
-local CCView = require("CCView")
+local CCEventHandler = CCRequire("CCEventHandler")
+local CCView = CCRequire("CCView")
 loadAPI("CCGraphics")
 loadAPI("CCWindowRegistry")
 

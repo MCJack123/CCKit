@@ -9,6 +9,7 @@
 if _G.windowRegistry == nil then 
     _G.windowRegistry = {}
     _G.windowRegistry.zPos = {}
+    _G.windowRegistry.manualOverride = false
 end
 
 function registerApplication(appname)
@@ -101,6 +102,8 @@ function getAppZ(appname)
 end
 
 function rayTest(win, px, py)
+    -- manual override
+    if _G.windowRegistry.manualOverride then return false end
     if win.application == nil or _G.windowRegistry[win.application.name] == nil or win.frame == nil or px == nil or py == nil then return false end
     -- If the click isn't on the window then of course it didn't hit
     if px < win.frame.x or py < win.frame.y or px >= win.frame.x + win.frame.width or py >= win.frame.y + win.frame.height then return false end

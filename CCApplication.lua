@@ -6,7 +6,7 @@
 -- Copyright (c) 2018 JackMacWindows.
 
 os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCLog = require("CCLog")
+local CCLog = CCRequire("CCLog")
 if _G._PID ~= nil then loadAPI("CCKernel") end
 loadAPI("CCWindowRegistry")
 
@@ -99,6 +99,8 @@ function CCApplication(name)
     end
     function retval:runLoop()
         --print("starting loop")
+        if _G._runningApps == nil then _G._runningApps = 1
+        else _G._runningApps = _G._runningApps + 1 end
         self.log:open()
         if _G.windowRegistry[self.name] == nil then CCWindowRegistry.registerApplication(self.name) end
         if CCKernel ~= nil then CCKernel.broadcast("redraw_all", self.name, true) end
@@ -131,9 +133,13 @@ function CCApplication(name)
                 end
             elseif ev == "redraw_window" then
                 if self.objects[p1] ~= nil and self.objects[p1].redraw ~= nil then self.objects[p1]:redraw() end
+            elseif ev == "redraw_quick" then
+                for k,v in pairs(self.objectOrder) do if self.objects[v] ~= nil and self.objects[v].class == "CCWindow" and self.objects[v].window ~= nil then self.objects[v].window.redraw() end end
             elseif ev == "redraw_all" then
-                if p1 ~= self.name then for k,v in pairs(self.objectOrder) do if self.objects[v] ~= nil and self.objects[v].class == "CCWindow" and self.objects[v].window ~= nil then self.objects[v]:redraw(false) end end
+                if p1 ~= self.name then for k,v in pairs(self.objectOrder) do if self.objects[v] ~= nil and self.objects[v].class == "CCWindow" and self.objects[v].window ~= nil then self.objects[v].window.redraw() end end
                 elseif p2 == true then CCWindowRegistry.setAppTop(self.name) end
+            elseif ev == "quit_app" and p1 == self.name then
+                for k,v in pairs(self.objectOrder) do if self.objects[v] ~= nil and self.objects[v].class == "CCWindow" and self.objects[v].window ~= nil then self.objects[v]:close() end end
             end
             local didEvent = false
             local redraws = {}
@@ -145,9 +151,11 @@ function CCApplication(name)
                         self.log:debug(textutils.serialize(w))
                         self.log:error("Could not find object for " .. tostring(w.self), "CCApplication")
                     else
+                        --print("event " .. ev .. " object " .. w.self .. " class " .. self.objects[w.self].class)
                         if w.func(self.objects[w.self], p1, p2, p3, p4, p5) then 
                             redraws[w.self] = true
                             didEvent = true
+                            --print("object " .. w.self .. " class " .. self.objects[w.self].class)
                             break 
                         end
                     end
@@ -158,7 +166,8 @@ function CCApplication(name)
         --print("ending loop")
         self.log:close()
         CCWindowRegistry.deregisterApplication(self.name)
-        coroutine.yield()
+        _G._runningApps = _G._runningApps - 1
+        --coroutine.yield()
     end
     function retval:startRunLoop()
         self.coro = coroutine.create(self.runLoop)
