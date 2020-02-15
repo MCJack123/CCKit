@@ -6,11 +6,11 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCButton = require("CCButton")
-local CCTextView = require("CCTextView")
-local CCViewController = require("CCViewController")
-local CCWindow = require("CCWindow")
+local CCKitGlobals = require "CCKitGlobals"
+local CCButton = require "CCButton"
+local CCTextView = require "CCTextView"
+local CCViewController = require "CCViewController"
+local CCWindow = require "CCWindow"
 
 local function AlertViewController(w, h, text)
     local retval = CCViewController()
@@ -30,7 +30,7 @@ local function AlertViewController(w, h, text)
     return retval
 end
 
-function CCAlertWindow(x, y, width, height, title, message, application)
+local function CCAlertWindow(x, y, width, height, title, message, application)
     local retval = CCWindow(x, y, width, height)
     retval.maximizable = false
     retval:setTitle(title)
@@ -38,3 +38,5 @@ function CCAlertWindow(x, y, width, height, title, message, application)
     retval:setViewController(newvc, application)
     return retval
 end
+
+return CCAlertWindow

@@ -5,10 +5,12 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-byWordWrapping = 1
-byCharWrapping = 2
-byClipping = 4
-byTruncatingHead = 8
+local CCLineBreakMode = {
+    byWordWrapping = 1,
+    byCharWrapping = 2,
+    byClipping = 4,
+    byTruncatingHead = 8,
+}
 
 function string.split(str, tok)
     words = {}
@@ -22,17 +24,17 @@ function table.count(tab)
     return i
 end
 
-function divideText(text, width, mode)
+function CCLineBreakMode.divideText(text, width, mode)
     local retval = {}
-    if bit.band(mode, byCharWrapping) == byCharWrapping then
+    if bit.band(mode, CCLineBreakMode.byCharWrapping) == CCLineBreakMode.byCharWrapping then
         for i=1,string.len(text),width do table.insert(retval, string.sub(text, i, i + width)) end
-    elseif bit.band(mode, byClipping) == byClipping then
+    elseif bit.band(mode, CCLineBreakMode.byClipping) == CCLineBreakMode.byClipping then
         local lines = string.split(text, "\n")
-        for k,line in pairs(lines) do table.insert(retval, string.sub(line, 1, width)) end
+        for _,line in pairs(lines) do table.insert(retval, string.sub(line, 1, width)) end
     else
         local words = string.split(text, "[%w%p]+")
         local line = ""
-        for k,word in pairs(words) do
+        for _,word in pairs(words) do
             if string.len(line) + string.len(word) >= width then
                 table.insert(retval, line)
                 line = ""
@@ -44,3 +46,4 @@ function divideText(text, width, mode)
     return retval
 end
 
+return CCLineBreakMode

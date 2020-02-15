@@ -6,11 +6,11 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-loadAPI("CCGraphics")
-local CCEventHandler = require("CCEventHandler")
-if _G._PID ~= nil then loadAPI("CCKernel") end
-loadAPI("CCWindowRegistry")
+local CCKitGlobals = require "CCKitGlobals"
+local CCGraphics = require "CCGraphics"
+local CCEventHandler = require "CCEventHandler"
+--if _G._PID ~= nil then loadAPI("CCKernel") end
+local CCWindowRegistry = require "CCWindowRegistry"
 
 -- Constants for the colors of the window
 
@@ -31,7 +31,7 @@ function string.random(length)
   end
 end
 
-function CCWindow(x, y, width, height)
+local function CCWindow(x, y, width, height)
     local retval = CCEventHandler("CCWindow")
     retval.window = window.create(term.native(), x, y, width, height)
     retval.title = ""
@@ -100,7 +100,7 @@ function CCWindow(x, y, width, height)
             --self:redraw()
             self.frame.x = px - self.mouseOffset
             self.frame.y = py
-            --if not CCKitGlobals.liveWindowMove then paintutils.drawBox(self.frame.x, self.frame.y, self.frame.x + self.frame.width - 1, self.frame.y + self.frame.height - 1, CCKitGlobals.windowBackgroundColor) end
+            if not CCKitGlobals.liveWindowMove then paintutils.drawBox(self.frame.x, self.frame.y, self.frame.x + self.frame.width - 1, self.frame.y + self.frame.height - 1, CCKitGlobals.windowBackgroundColor) end
             return true
         end
         return false
@@ -217,3 +217,5 @@ function CCWindow(x, y, width, height)
     retval:redraw()
     return retval
 end
+
+return CCWindow

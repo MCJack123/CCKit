@@ -6,11 +6,11 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCView = require("CCView")
-loadAPI("CCGraphics")
+local CCKitGlobals = require "CCKitGlobals"
+local CCView = require "CCView"
+local CCGraphics = require "CCGraphics"
 
-function CCImageView(x, y, image)
+local function CCImageView(x, y, image)
     local retval = CCView(x, y, image.termWidth, image.termHeight)
     retval.image = image
     function retval:draw()
@@ -22,4 +22,4 @@ function CCImageView(x, y, image)
     return retval
 end
 
---os.unloadAPI("CCView")
+return CCImageView

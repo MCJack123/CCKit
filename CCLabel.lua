@@ -5,11 +5,11 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-loadAPI("CCGraphics")
-local CCView = require("CCView")
+local CCKitGlobals = require "CCKitGlobals"
+local CCGraphics = require "CCGraphics"
+local CCView = require "CCView"
 
-function CCLabel(x, y, text)
+local function CCLabel(x, y, text)
     local retval = CCView(x, y, string.len(text), 1)
     retval.text = text
     retval.textColor = CCKitGlobals.defaultTextColor
@@ -22,3 +22,5 @@ function CCLabel(x, y, text)
     end
     return retval
 end
+
+return CCLabel

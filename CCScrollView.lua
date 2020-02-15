@@ -6,12 +6,12 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-loadAPI("CCGraphics")
-local CCView = require("CCView")
-local CCEventHandler = require("CCEventHandler")
-local CCControl = require("CCControl")
-loadAPI("CCWindowRegistry")
+local CCKitGlobals = require "CCKitGlobals"
+local CCGraphics = require "CCGraphics"
+local CCView = require "CCView"
+local CCEventHandler = require "CCEventHandler"
+local CCControl = require "CCControl"
+local CCWindowRegistry = require "CCWindowRegistry"
 
 local function CCScrollBar(x, y, height) -- may make this public later
     local retval = CCControl(x, y, 1, height)
@@ -53,7 +53,7 @@ local function CCScrollBar(x, y, height) -- may make this public later
             for k,v in pairs(self.subviews) do v:draw() end
         end
     end
-    retval:setAction(function() return end, self)
+    retval:setAction(function() return end, retval)
     retval:addEvent("mouse_click", retval.onMouseDown)
     retval:addEvent("mouse_drag", retval.onDrag)
     return retval
@@ -96,8 +96,8 @@ end
 
 function math.round(num) if num % 1 < 0.5 then return math.floor(num) else return math.ceil(num) end end
 
-function CCScrollView(x, y, width, height, innerHeight)
-    local retval = multipleInheritance(CCView(x, y, width, height), CCEventHandler("CCScrollView"))
+local function CCScrollView(x, y, width, height, innerHeight)
+    local retval = CCKitGlobals.multipleInheritance(CCView(x, y, width, height), CCEventHandler("CCScrollView"))
     retval.contentHeight = innerHeight
     retval.currentOffset = 0
     retval.renderWindow = window.create(term.native(), 1, 1, width-1, innerHeight, false)
@@ -171,3 +171,5 @@ function CCScrollView(x, y, width, height, innerHeight)
     retval:addEvent("slider_dragged", retval.didScroll)
     return retval
 end
+
+return CCScrollView

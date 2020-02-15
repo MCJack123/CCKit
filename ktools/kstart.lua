@@ -1,5 +1,5 @@
 if _G._PID == nil then error("CCKit is disabled") end
-os.loadAPI("CCKit/CCKitGlobals.lua")
-loadAPI("CCKernel")
+local CCKitGlobals = require "CCKitGlobals"
+local CCKernel = require "CCKernel"
 
 CCKernel.exec(...)

@@ -6,12 +6,12 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCView = require("CCView")
-local CCEventHandler = require("CCEventHandler")
+local CCKitGlobals = require "CCKitGlobals"
+local CCView = require "CCView"
+local CCEventHandler = require "CCEventHandler"
 
-function CCRadioGroup(x, y, width, height)
-    local retval = multipleInheritance(CCView(x, y, width, height), CCEventHandler("CCRadioGroup"))
+local function CCRadioGroup(x, y, width, height)
+    local retval = CCKitGlobals.multipleInheritance(CCView(x, y, width, height), CCEventHandler("CCRadioGroup"))
     retval.selectedId = -1
     retval.nextId = 0
     retval.hasEvents = true
@@ -48,3 +48,5 @@ function CCRadioGroup(x, y, width, height)
     retval:addEvent("radio_selected", retval.radioHandler)
     return retval
 end
+
+return CCRadioGroup

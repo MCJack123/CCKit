@@ -6,9 +6,9 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-loadAPI("CCLog")
-loadAPI("CCImageType")
+local CCKitGlobals = require "CCKitGlobals"
+local CCLog = require "CCLog"
+local CCImageType = require "CCImageType"
 
 local colorString = "0123456789abcdef"
 
@@ -16,7 +16,7 @@ local function cp(color)
     local recurses = 1
     local cc = color
     while cc ~= 1 do 
-        cc = bit.brshift(cc, 1)
+        cc = bit.blogic_rshift(cc, 1)
         recurses = recurses + 1
     end
     --print(recurses .. " " .. color .. " \"" .. string.sub(colorString, recurses, recurses) .. "\"")
@@ -41,7 +41,7 @@ local function writeNFP(image)
     return retval
 end
 
-function CCImageWriter()
+local function CCImageWriter()
     local retval = {}
     retval.fileHandle = nil
     retval.isOpen = false
@@ -61,7 +61,7 @@ function CCImageWriter()
         return 0
     end
     function retval:write(image)
-        if not self.isOpen or self.type == none then return {width = 0, height = 0, termWidth = 0, termHeight = 0} end
+        if not self.isOpen or self.type == CCImageType.none then return {width = 0, height = 0, termWidth = 0, termHeight = 0} end
         if self.type == CCImageType.ccg then self.fileHandle.write(writeCCG(image))
         elseif self.type == CCImageType.nfp then self.fileHandle.write(writeNFP(image))
         else
@@ -78,3 +78,5 @@ function CCImageWriter()
     end
     return retval
 end
+
+return CCImageWriter

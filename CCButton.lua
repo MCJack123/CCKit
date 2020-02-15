@@ -6,10 +6,11 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCControl = require("CCControl")
+local CCKitGlobals = require "CCKitGlobals"
+local CCControl = require "CCControl"
+local CCGraphics = require "CCGraphics"
 
-function CCButton(x, y, width, height)
+local function CCButton(x, y, width, height)
     local retval = CCControl(x, y, width, height)
     retval.textColor = CCKitGlobals.defaultTextColor
     retval.text = nil
@@ -39,3 +40,5 @@ function CCButton(x, y, width, height)
     end
     return retval
 end
+
+return CCButton

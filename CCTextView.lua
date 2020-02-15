@@ -5,12 +5,12 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCView = require("CCView")
-loadAPI("CCLineBreakMode")
-loadAPI("CCGraphics")
+local CCKitGlobals = require "CCKitGlobals"
+local CCView = require "CCView"
+local CCLineBreakMode = require "CCLineBreakMode"
+local CCGraphics = require "CCGraphics"
 
-function CCTextView(x, y, width, height)
+local function CCTextView(x, y, width, height)
     local retval = CCView(x, y, width, height)
     retval.textColor = CCKitGlobals.defaultTextColor
     retval.text = ""
@@ -47,4 +47,5 @@ function CCTextView(x, y, width, height)
     end
     return retval
 end
-    
+
+return CCTextView

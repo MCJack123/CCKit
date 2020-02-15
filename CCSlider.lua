@@ -6,12 +6,12 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCControl = require("CCControl")
-loadAPI("CCGraphics")
-loadAPI("CCWindowRegistry")
+local CCKitGlobals = require "CCKitGlobals"
+local CCControl = require "CCControl"
+local CCGraphics = require "CCGraphics"
+local CCWindowRegistry = require "CCWindowRegistry"
 
-function CCSlider(x, y, width)
+local function CCSlider(x, y, width)
     local retval = CCControl(x, y, width, 1)
     retval.value = 0.0
     retval.minimumValue = 0.0
@@ -71,8 +71,10 @@ function CCSlider(x, y, width)
             for k,v in pairs(self.subviews) do v:draw() end
         end
     end
-    retval:setAction(function() return end, self)
+    retval:setAction(function() return end, retval)
     retval:addEvent("mouse_click", retval.onMouseDown)
     retval:addEvent("mouse_drag", retval.onDrag)
     return retval
 end
+
+return CCSlider

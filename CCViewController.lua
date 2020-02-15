@@ -7,10 +7,10 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCView = require("CCView")
+local CCKitGlobals = require "CCKitGlobals"
+local CCView = require "CCView"
 
-function CCViewController()
+local function CCViewController()
     local retval = {}
     retval.view = {}
     retval.window = nil
@@ -36,4 +36,4 @@ function CCViewController()
     return retval
 end
 
---os.unloadAPI("CCView")
+return CCViewController

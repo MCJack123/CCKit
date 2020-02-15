@@ -7,9 +7,9 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-loadAPI("CCLog")
-loadAPI("CCImageType")
+local CCKitGlobals = require "CCKitGlobals"
+local CCLog = require "CCLog"
+local CCImageType = require "CCImageType"
 
 local function inputIter(inputf)
     return inputf
@@ -71,7 +71,7 @@ local function loadNFP(inputf)
     return retval
 end
 
-function CCImageLoader()
+local function CCImageLoader()
     local retval = {}
     retval.fileHandle = nil
     retval.isOpen = false
@@ -108,3 +108,5 @@ function CCImageLoader()
     end
     return retval
 end
+
+return CCImageLoader

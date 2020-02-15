@@ -6,11 +6,11 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-loadAPI("CCGraphics")
-local CCView = require("CCView")
+local CCKitGlobals = require "CCKitGlobals"
+local CCGraphics = require "CCGraphics"
+local CCView = require "CCView"
 
-function CCProgressBar(x, y, width)
+local function CCProgressBar(x, y, width)
     local retval = CCView(x, y, width, 1)
     retval.backgroundColor = colors.lightGray
     retval.foregroundColor = colors.yellow
@@ -44,3 +44,5 @@ function CCProgressBar(x, y, width)
     end
     return retval
 end
+
+return CCProgressBar

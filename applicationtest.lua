@@ -1,10 +1,10 @@
 --if not os.loadAPI("CCKit/CCKitAmalgamated.lua") then error("could not load CCKit") end
 --CCKit = CCKitAmalgamated
-if not os.loadAPI("CCKit/CCKit.lua") then error("could not load CCKit") end
-if _G._PID ~= nil then loadAPI("CCKernel") end
+local CCKit = require "CCKit"
+--if _G._PID ~= nil then loadAPI("CCKernel") end
 
 function MyViewController()
-    local retval = multipleInheritance(CCKit.CCViewController(), CCKit.CCEventHandler("MyViewController"))
+    local retval = CCKit.CCKitGlobals.multipleInheritance(CCKit.CCViewController(), CCKit.CCEventHandler("MyViewController"))
     retval.toggleName = nil
     retval.sliderName = nil
     retval.button = CCKit.CCButton(4, 9, 8, 1)
@@ -32,7 +32,7 @@ function MyViewController()
     function retval:viewDidLoad()
         local loader = CCKit.CCImageLoader()
         local res = loader:open("CCKit/testimage.lon")
-        if res == 1 then loader.type = CCImageType.ccg
+        if res == 1 then loader.type = CCKit.CImageType.ccg
         elseif res == -1 then self.application.log:error("Could not open image file") end
         local image = loader:read()
         if image.termWidth == 0 then self.application.log:error("Error reading file")

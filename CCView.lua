@@ -6,10 +6,10 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-loadAPI("CCGraphics")
+local CCKitGlobals = require "CCKitGlobals"
+local CCGraphics = require "CCGraphics"
 
-function CCView(x, y, width, height)
+local function CCView(x, y, width, height)
     local retval = {}
     retval.class = "CCView"
     retval.parentWindowName = nil
@@ -61,3 +61,5 @@ function CCView(x, y, width, height)
     end
     return retval
 end
+
+return CCView

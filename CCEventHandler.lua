@@ -23,7 +23,7 @@ function string.random(length)
   end
 end
 
-function CCEventHandler(class)
+local function CCEventHandler(class)
     local retval = {}
     retval.name = string.random(8)
     retval.class = class
@@ -36,3 +36,5 @@ function CCEventHandler(class)
     end
     return retval
 end
+
+return CCEventHandler

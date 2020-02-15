@@ -5,14 +5,14 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCEventHandler = require("CCEventHandler")
-local CCView = require("CCView")
-loadAPI("CCGraphics")
-loadAPI("CCWindowRegistry")
+local CCKitGlobals = require "CCKitGlobals"
+local CCEventHandler = require "CCEventHandler"
+local CCView = require "CCView"
+local CCGraphics = require "CCGraphics"
+local CCWindowRegistry = require "CCWindowRegistry"
 
-function CCTextField(x, y, width)
-    local retval = multipleInheritance(CCView(x, y, width, 1), CCEventHandler("CCTextField"))
+local function CCTextField(x, y, width)
+    local retval = CCKitGlobals.multipleInheritance(CCView(x, y, width, 1), CCEventHandler("CCTextField"))
     retval.text = ""
     retval.isSelected = false
     retval.isEnabled = true
@@ -76,3 +76,5 @@ function CCTextField(x, y, width)
     retval:addEvent("char", retval.onChar)
     return retval
 end
+
+return CCTextField

@@ -6,10 +6,11 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCControl = require("CCControl")
+local CCKitGlobals = require "CCKitGlobals"
+local CCControl = require "CCControl"
+local CCGraphics = require "CCGraphics"
 
-function CCCheckbox(x, y, text)
+local function CCCheckbox(x, y, text)
     local size = 1
     if type(text) == "string" then size = string.len(text) + 2 end
     local retval = CCControl(x, y, size, 1)
@@ -52,3 +53,5 @@ function CCCheckbox(x, y, text)
     retval:setAction(retval.action, retval)
     return retval
 end
+
+return CCCheckbox

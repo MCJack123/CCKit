@@ -6,15 +6,17 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-function deepcopy(orig)
+local CCKitGlobalFunctions = {}
+
+function CCKitGlobalFunctions.deepcopy(orig)
     local orig_type = type(orig)
     local copy
     if orig_type == 'table' then
         copy = {}
         for orig_key, orig_value in next, orig, nil do
-            copy[deepcopy(orig_key)] = deepcopy(orig_value)
+            copy[CCKitGlobalFunctions.deepcopy(orig_key)] = CCKitGlobalFunctions.deepcopy(orig_value)
         end
-        setmetatable(copy, deepcopy(getmetatable(orig)))
+        setmetatable(copy, CCKitGlobalFunctions.deepcopy(getmetatable(orig)))
     else -- number, string, boolean, etc
         copy = orig
     end
@@ -24,33 +26,19 @@ end
 function table.combine(a, b)
     if type(a) ~= "table" or type(b) ~= "table" then return nil end
     local orig_type = type(b)
-    local copy = deepcopy(a)
+    local copy = CCKitGlobalFunctions.deepcopy(a)
     for orig_key, orig_value in next, b, nil do
-        copy[deepcopy(orig_key)] = deepcopy(orig_value)
+        copy[CCKitGlobalFunctions.deepcopy(orig_key)] = CCKitGlobalFunctions.deepcopy(orig_value)
     end
-    setmetatable(copy, deepcopy(getmetatable(b)))
+    setmetatable(copy, CCKitGlobalFunctions.deepcopy(getmetatable(b)))
     return copy
 end
 
-function multipleInheritance(...)
+function CCKitGlobalFunctions.multipleInheritance(...)
     local tables = { ... }
     local retval = tables[1]
     for k,v in ipairs(tables) do if k ~= 1 then retval = table.combine(retval, v) end end
     return retval
-end
-
-function require(class)
-    local remove = true
-    if _G[class] ~= nil and type(_G[class]) == "function" then remove = false
-    else os.loadAPI(CCKitGlobals.CCKitDir .. "/" .. class .. ".lua") end
-    local temp = _G[class]
-    if remove then os.unloadAPI(class) end
-    return temp[class]
-end
-
-function loadAPI(class)
-    if _G[class] ~= nil and not CCKitGlobals.shouldDoubleRequire then return end
-    os.loadAPI(CCKitGlobals.CCKitDir .. "/" .. class .. ".lua")
 end
 
 -- Better serialize
@@ -130,7 +118,7 @@ function textutils.serialize( t )
     return serializeImpl( t, tTracking, "" )
 end
 
-function setEGAColors() -- just putting this here if anyone really wants it
+function CCKitGlobalFunctions.setEGAColors() -- just putting this here if anyone really wants it
     if tonumber(string.sub(os.version(), 9)) < 1.8 then error("This requires CraftOS 1.8 or later.", 2) end
     term.setPaletteColor(colors.black, 0, 0, 0)
     term.setPaletteColor(colors.blue, 0, 0, 0.625)
@@ -149,3 +137,5 @@ function setEGAColors() -- just putting this here if anyone really wants it
     term.setPaletteColor(colors.yellow, 1, 1, 0.3125)
     term.setPaletteColor(colors.white, 1, 1, 1)
 end
+
+return CCKitGlobalFunctions

@@ -6,8 +6,8 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-loadAPI("CCLog")
+local CCKitGlobals = require "CCKitGlobals"
+local CCLog = require "CCLog"
 
 kernel_running = true
 

@@ -5,10 +5,10 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-loadAPI("CCLog")
-if _G._PID ~= nil then loadAPI("CCKernel") end
-loadAPI("CCWindowRegistry")
+local CCKitGlobals = require "CCKitGlobals"
+local CCLog = require "CCLog"
+--if _G._PID ~= nil then loadAPI("CCKernel") end
+local CCWindowRegistry = require("CCWindowRegistry")
 
 local colorString = "0123456789abcdef"
 
@@ -16,7 +16,7 @@ local function cp(color)
     local recurses = 1
     local cc = color
     while cc ~= 1 do 
-        cc = bit.brshift(cc, 1)
+        cc = bit.blogic_rshift(cc, 1)
         recurses = recurses + 1
     end
     --print(recurses .. " " .. color .. " \"" .. string.sub(colorString, recurses, recurses) .. "\"")
@@ -45,7 +45,7 @@ function string.random(length)
   end
 end
 
-function CCApplication(name)
+local function CCApplication(name)
     local retval = {}
     term.setBackgroundColor(colors.black)
     retval.name = string.random(8)
@@ -57,13 +57,15 @@ function CCApplication(name)
     retval.objectOrder = {}
     retval.applicationName = name
     retval.showName = false
-    if name ~= nil then retval.log = CCLog.CCLog(name)
+    if name ~= nil then retval.log = CCLog(name)
     else retval.log = CCLog.default end
     CCLog.default.logToConsole = false
     retval.log:open()
     function retval:setBackgroundColor(color)
         self.backgroundColor = color
         term.setBackgroundColor(color)
+        term.setCursorPos(1, 1)
+        term.clear()
         term.clear()
         for k,v in pairs(self.objects) do if k ~= "count" and v.class == "CCWindow" then v:redraw() end end
     end
@@ -170,3 +172,5 @@ function CCApplication(name)
     CCWindowRegistry.registerApplication(retval.name)
     return retval
 end
+
+return CCApplication

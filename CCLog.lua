@@ -24,7 +24,7 @@ end
 
 -- this doesn't account for leap years, but that doesn't matter in Minecraft
 local junOff = 31 + 28 + 31 + 30 + 31 + 30
-function dayToString(day)
+local function dayToString(day)
     if day <= 31 then return "Jan " .. day
     elseif day > 31 and day <= 31 + 28 then return "Feb " .. day - 31
     elseif day > 31 + 28 and day <= 31 + 28 + 31 then return "Mar " .. day - 31 - 28
@@ -39,7 +39,9 @@ function dayToString(day)
     else return "Dec " .. day - junOff - 31 - 31 - 30 - 31 - 30 end
 end
 
-function CCLog(name)
+local default = {}
+
+local function CCLog(name)
     local retval = {}
     retval.name = name
     retval.fileDescriptor = nil
@@ -155,7 +157,6 @@ function CCLog(name)
     return retval
 end
 
-default = {}
 default.fileDescriptor = nil
 default.shell = nil
 default.logToConsole = true
@@ -259,3 +260,5 @@ function default:close()
 end
 
 default:open()
+
+return setmetatable({default = default}, {__call = function(_, name) return CCLog(name) end})

@@ -7,13 +7,13 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-os.loadAPI("CCKit/CCKitGlobals.lua")
-local CCEventHandler = require("CCEventHandler")
-local CCView = require("CCView")
-loadAPI("CCWindowRegistry")
+local CCKitGlobals = require "CCKitGlobals"
+local CCEventHandler = require "CCEventHandler"
+local CCView = require "CCView"
+local CCWindowRegistry = require "CCWindowRegistry"
 
-function CCControl(x, y, width, height)
-    local retval = multipleInheritance(CCView(x, y, width, height), CCEventHandler("CCControl"))
+local function CCControl(x, y, width, height)
+    local retval = CCKitGlobals.multipleInheritance(CCView(x, y, width, height), CCEventHandler("CCControl"))
     retval.hasEvents = true
     retval.isEnabled = true
     retval.isSelected = false
@@ -76,3 +76,5 @@ function CCControl(x, y, width, height)
     retval:addEvent("mouse_up", retval.onMouseUp)
     return retval
 end
+
+return CCControl
