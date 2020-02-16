@@ -28,7 +28,11 @@ local function CCViewController()
     function retval:viewDidLoad()
         -- override this to create custom subviews
     end
+    function retval:viewWillDisappear()
+        -- override this to deinitialize your app
+    end
     function retval:dismiss()
+        self:viewWillDisappear()
         if self.view.subviews ~= nil then
             for k,v in pairs(self.view.subviews) do self.view:deregisterSubview(v) end
         end

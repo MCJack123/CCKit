@@ -112,7 +112,8 @@ local function CCApplication(name)
                 term.setCursorPos(1, 1)
                 term.write(self.applicationName)
             end
-            local ev, p1, p2, p3, p4, p5 = os.pullEvent()
+            local evd = {os.pullEvent()}
+            local ev, p1, p2, p3, p4, p5 = table.unpack(evd)
             --print("recieved event " .. ev)
             if ev == "closed_window" then
                 if self.objects[p1] == nil or self.objects[p1].class ~= "CCWindow" then 
@@ -141,12 +142,12 @@ local function CCApplication(name)
             for k,v in pairs(self.events) do if ev == k then 
                 --print("got event " .. ev)
                 --print(textutils.serialize(v))
-                for l,w in pairs(v) do 
+                for l,w in ipairs(v) do 
                     if self.objects[w.self] == nil then 
                         self.log:debug(textutils.serialize(w))
                         self.log:error("Could not find object for " .. tostring(w.self), "CCApplication")
                     else
-                        if w.func(self.objects[w.self], p1, p2, p3, p4, p5) then 
+                        if w.func(self.objects[w.self], table.unpack(evd, 2)) then 
                             redraws[w.self] = true
                             didEvent = true
                             break 
@@ -154,7 +155,9 @@ local function CCApplication(name)
                     end
                 end 
             end end
-            if didEvent then for k,v in pairs(self.objectOrder) do if self.objects[v] ~= nil and self.objects[v].class == "CCWindow" and self.objects[v].window ~= nil then self.objects[v].window.redraw() end end end
+            if didEvent then for _,vv in ipairs(_G.windowRegistry[self.name]) do for _,v in ipairs(self.objectOrder) do 
+                if self.objects[v] ~= nil and self.objects[v].class == "CCWindow" and self.objects[v].window ~= nil and self.objects[v].name == vv.name then self.objects[v].window.redraw() end end end
+            end
         end
         --print("ending loop")
         self.log:close()

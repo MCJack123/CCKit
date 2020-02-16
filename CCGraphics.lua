@@ -28,11 +28,11 @@ local function cp(color)
     return string.sub(colorString, recurses, recurses)
 end
 
-function CCGraphics.drawFilledBox(x, y, endx, endy, color) 
-    for px=x,endx do for py=y,endy do 
+function CCGraphics.drawFilledBox(x, y, endx, endy, color)
+    for px=x,endx do for py=y,endy do
         term.setCursorPos(px, py)
-        term.blit(" ", "0", cp(color)) 
-    end end 
+        term.blit(" ", "0", cp(color))
+    end end
 end
 
 -- Converts a 6-bit pixel value to a character.

@@ -15,7 +15,7 @@ titleBarTextColor = colors.black,
 
 windowBackgroundColor = colors.white,
 
-liveWindowMove = false,
+liveWindowMove = true,
 
 
 -- Text views

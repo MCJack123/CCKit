@@ -87,20 +87,26 @@ local function CCWindow(x, y, width, height)
                 CCWindowRegistry.setAppTop(self.application.name)
                 CCWindowRegistry.setWinTop(self)
             end
-            CCGraphics.drawFilledBox(self.frame.x, self.frame.y, self.frame.x + self.frame.width, self.frame.y + self.frame.height, self.repaintColor)
             if CCKernel ~= nil then 
                 CCKernel.broadcast("redraw_all", self.application.name)
                 os.queueEvent("done_redraw")
                 os.pullEvent("done_redraw")
             end
             CCWindowRegistry.moveWin(self, px - self.mouseOffset, py)
+            --self.window.setVisible(false)
             self.window.reposition(px - self.mouseOffset, py)
             if self.viewController ~= nil then self.viewController.view:updateAbsolutes(px - self.frame.x - self.mouseOffset, py - self.frame.y) end
             --CCGraphics.redrawScreen(self.window)
             --self:redraw()
+            CCGraphics.drawFilledBox(self.frame.x, self.frame.y, self.frame.x + self.frame.width, self.frame.y + self.frame.height, self.repaintColor)
             self.frame.x = px - self.mouseOffset
             self.frame.y = py
-            if not CCKitGlobals.liveWindowMove then paintutils.drawBox(self.frame.x, self.frame.y, self.frame.x + self.frame.width - 1, self.frame.y + self.frame.height - 1, CCKitGlobals.windowBackgroundColor) end
+            if not CCKitGlobals.liveWindowMove then 
+                paintutils.drawBox(self.frame.x, self.frame.y, self.frame.x + self.frame.width - 1, self.frame.y + self.frame.height - 1, CCKitGlobals.windowBackgroundColor)
+            else
+                --self.window.setVisible(true)
+                --self.window.redraw()
+            end
             return true
         end
         return false

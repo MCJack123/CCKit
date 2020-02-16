@@ -7,7 +7,7 @@ Copy this entire repository into a folder named `CCKit` at the root of your Comp
 # Quick Start
 <span>1.</span> Load the `CCKit` api: 
 ```lua
-os.loadAPI("CCKit/CCKit.lua")
+local CCKit = require "CCKit"
 ```
 <span>2.</span> Create a main view controller:
 ```lua

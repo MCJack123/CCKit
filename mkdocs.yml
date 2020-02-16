@@ -18,7 +18,7 @@ nav:
     - CCImageView: CCImageView.md
     - CCImageWriter: CCImageWriter.md
     - CCLabel: CCLabel.md
-    - CCLog (load as API): CCLog.md
+    - CCLog: CCLog.md
     - CCProgressBar: CCProgressBar.md
     - CCRadioButton: CCRadioButton.md
     - CCRadioGroup: CCRadioGroup.md
