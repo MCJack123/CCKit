@@ -1,9 +1,11 @@
+-- Key combo consists of a list of keys that must be down
 local function CCMenuItem(title, action, keycombo)
     local retval = {}
     retval.isEnabled = true
     retval.isHidden = false
     retval.target = nil
     retval.action = action
+    retval.tag = 0
     retval.title = title
     retval.isSelected = false
     retval.submenu = nil
@@ -12,8 +14,13 @@ local function CCMenuItem(title, action, keycombo)
     retval.menu = nil
     retval.keycombo = keycombo
     retval.indentationLevel = 0
-    
     return retval
 end
 
-return CCMenuItem
+return setmetatable({
+    separator = function()
+        local retval = CCMenuItem()
+        retval.isSeparatorItem = true
+        return retval
+    end
+}, {__call = function(self, ...) return CCMenuItem(...) end})

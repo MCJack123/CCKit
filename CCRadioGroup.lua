@@ -42,7 +42,7 @@ local function CCRadioGroup(x, y, width, height)
             self.nextId = self.nextId + 1
             view.groupName = self.name
         end
-        view:setParent(self.window, self.application, self.parentWindowName, self.frame.absoluteX, self.frame.absoluteY)
+        view:setParent(self.window, self.application, self.parentWindowName, self.frame.absoluteX, self.frame.absoluteY, self)
         table.insert(self.subviews, view)
     end
     retval:addEvent("radio_selected", retval.radioHandler)

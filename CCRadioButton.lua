@@ -41,7 +41,7 @@ local function CCRadioButton(x, y, text)
             if self.isEnabled then textColor = self.textColor else textColor = CCKitGlobals.buttonDisabledTextColor end
             CCGraphics.drawBox(self.window, 0, 0, 1, 1, backgroundColor, textColor)
             if retval.isOn then CCGraphics.setCharacter(self.window, 0, 0, string.char(7))
-            else CCGraphics.clearCharacter(self.window, 0, 0) end
+            else CCGraphics.setCharacter(self.window, 0, 0, string.char(0xBA)) end
             if retval.text ~= nil then 
                 CCGraphics.drawBox(self.window, 1, 0, string.len(self.text) + 1, 1, CCKitGlobals.windowBackgroundColor, textColor)
                 CCGraphics.setString(self.window, 2, 0, self.text)

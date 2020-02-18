@@ -143,16 +143,17 @@ local function CCScrollView(x, y, width, height, innerHeight)
         if self.application == nil then error("Parent view must be added before subviews", 2) end
         if view == nil then self.application.log:error("Cannot add nil subview", 2) end
         if view.hasEvents then self.application:registerObject(view, view.name, false) end
-        if view.class == "CCScrollBar" then view:setParent(self.window, self.application, self.parentWindowName, self.frame.absoluteX, self.frame.absoluteY)
-        else view:setParent(self.renderWindow, self.application, self.parentWindowName, self.frame.absoluteX, self.frame.absoluteY - self.currentOffset) end
+        if view.class == "CCScrollBar" then view:setParent(self.window, self.application, self.parentWindowName, self.frame.absoluteX, self.frame.absoluteY, self)
+        else view:setParent(self.renderWindow, self.application, self.parentWindowName, self.frame.absoluteX, self.frame.absoluteY - self.currentOffset, self) end
         table.insert(self.subviews, view)
     end
-    function retval:setParent(parent, application, name, absoluteX, absoluteY)
+    function retval:setParent(parent, application, name, absoluteX, absoluteY, superview)
         self.parentWindow = parent
         self.parentWindowName = name
         self.application = application
         self.frame.absoluteX = absoluteX + self.frame.x
         self.frame.absoluteY = absoluteY + self.frame.y
+        self.superview = superview
         self.lastAbsolute = self.frame.absoluteY - self.currentOffset
         self.window = window.create(self.parentWindow, self.frame.x+1, self.frame.y+1, self.frame.width, self.frame.height)
         CCGraphics.initGraphics(self.window)

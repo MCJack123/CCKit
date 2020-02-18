@@ -13,6 +13,8 @@ titleBarColor = colors.yellow,
 
 titleBarTextColor = colors.black,
 
+inactiveTitleBarColor = colors.lightGray,
+
 windowBackgroundColor = colors.white,
 
 liveWindowMove = true,

@@ -21,7 +21,7 @@ end
 function CCWindowRegistry.registerWindow(win)
     if win.application == nil then error("Window does not have application", 2) end
     if _G.windowRegistry[win.application.name] == nil then error("Application " .. win.application.name .. " is not registered", 2) end
-    table.insert(_G.windowRegistry[win.application.name], 1, {name=win.name, x=win.frame.x, y=win.frame.y, width=win.frame.width, height=win.frame.height})
+    table.insert(_G.windowRegistry[win.application.name], {name=win.name, x=win.frame.x, y=win.frame.y, width=win.frame.width, height=win.frame.height})
 end
 
 function CCWindowRegistry.deregisterApplication(appname)

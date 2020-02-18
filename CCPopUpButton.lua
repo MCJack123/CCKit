@@ -3,11 +3,12 @@ local CCGraphics = require "CCGraphics"
 local CCControl = require "CCControl"
 local CCMenu = require "CCMenu"
 
+-- TODO
 local function CCPopUpButton(x, y, width, pullsDown)
     local retval = CCControl(x, y, width, 1)
     retval.backgroundColor = CCKitGlobals.buttonColor
     retval.pullsDown = pullsDown
-    retval.menu = CCMenu(...)
+    retval.menu = CCMenu("")
     retval.selectedItem = nil
     function retval:draw()
         if self.parentWindow ~= nil then
