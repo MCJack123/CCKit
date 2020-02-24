@@ -5,34 +5,41 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
+local class = require "class"
 local CCKitGlobals = require "CCKitGlobals"
 local CCEventHandler = require "CCEventHandler"
 local CCView = require "CCView"
 local CCGraphics = require "CCGraphics"
 local CCWindowRegistry = require "CCWindowRegistry"
 
-local function CCTextField(x, y, width)
-    local retval = CCKitGlobals.multipleInheritance(CCView(x, y, width, 1), CCEventHandler("CCTextField"))
-    retval.text = ""
-    retval.isSelected = false
-    retval.isEnabled = true
-    retval.cursorOffset = 0 -- later
-    retval.backgroundColor = colors.lightGray
-    retval.textColor = CCKitGlobals.defaultTextColor
-    retval.placeholderText = nil
-    function retval:setTextColor(color)
+return class "CCTextField" {extends = {CCView, CCEventHandler}} {
+    text = "",
+    isSelected = false,
+    isEnabled = true,
+    cursorOffset = 0, -- later
+    backgroundColor = colors.lightGray,
+    textColor = CCKitGlobals.defaultTextColor,
+    placeholderText = nil,
+    __init = function(x, y, width)
+        _ENV.CCView(x, y, width, 1)
+        _ENV.CCEventHandler("CCTextField")
+        self.addEvent("mouse_click", self.onClick)
+        self.addEvent("key", self.onKey)
+        self.addEvent("char", self.onChar)
+    end,
+    setTextColor = function(color)
         self.textColor = color
-        self:draw()
-    end
-    function retval:setEnabled(e)
+        self.draw()
+    end,
+    setEnabled = function(e)
         self.isEnabled = e
-        self:draw()
-    end
-    function retval:setPlaceholder(text)
+        self.draw()
+    end,
+    setPlaceholder = function(text)
         self.placeholderText = text
-        self:draw()
-    end
-    function retval:draw()
+        self.draw()
+    end,
+    draw = function()
         if self.parentWindow ~= nil then
             CCGraphics.drawBox(self.window, 0, 0, self.frame.width, self.frame.height, self.backgroundColor, self.textColor)
             local text = self.text
@@ -43,38 +50,32 @@ local function CCTextField(x, y, width)
             end
             if self.isSelected then text = text .. "_" end
             CCGraphics.setString(self.window, 0, 0, text)
-            for k,v in pairs(self.subviews) do v:draw() end
+            for _,v in pairs(self.subviews) do v.draw() end
         end
-    end
-    function retval:onClick(button, px, py)
+    end,
+    onClick = function(button, px, py)
         if not CCWindowRegistry.rayTest(self.application.objects[self.parentWindowName], px, py) then return false end
         if button == 1 then
             self.isSelected = px >= self.frame.absoluteX and py == self.frame.absoluteY and px < self.frame.absoluteX + self.frame.width and self.isEnabled
-            self:draw()
+            self.draw()
             return self.isSelected
         end
         return false
-    end
-    function retval:onKey(key, held)
+    end,
+    onKey = function(key, held)
         if key == keys.backspace and self.isSelected and self.isEnabled then
             self.text = string.sub(self.text, 1, string.len(self.text)-1)
-            self:draw()
+            self.draw()
             return true
         end
         return false
-    end
-    function retval:onChar(ch)
+    end,
+    onChar = function(ch)
         if self.isSelected and self.isEnabled then
             self.text = self.text .. ch
-            self:draw()
+            self.draw()
             return true
         end
         return false
-    end
-    retval:addEvent("mouse_click", retval.onClick)
-    retval:addEvent("key", retval.onKey)
-    retval:addEvent("char", retval.onChar)
-    return retval
-end
-
-return CCTextField
+    end,
+}

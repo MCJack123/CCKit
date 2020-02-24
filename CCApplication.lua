@@ -35,17 +35,15 @@ for i = 48,  57 do table.insert(charset, string.char(i)) end
 for i = 65,  90 do table.insert(charset, string.char(i)) end
 for i = 97, 122 do table.insert(charset, string.char(i)) end
 
-function string.random(length)
+local function string_random(length)
   --math.randomseed(os.clock())
 
   if length > 0 then
-    return string.random(length - 1) .. charset[math.random(1, #charset)]
+    return string_random(length - 1) .. charset[math.random(1, #charset)]
   else
     return ""
   end
 end
-
-self = nil -- silences errors
 
 return class "CCApplication" {
     isApplicationRunning = false,
@@ -53,7 +51,7 @@ return class "CCApplication" {
     showName = false,
     __init = function(name)
         term.setBackgroundColor(colors.black)
-        self.name = string.random(8)
+        self.name = string_random(8)
         self.objects = {count = 0}
         self.events = {}
         self.objectOrder = {}
@@ -150,7 +148,8 @@ return class "CCApplication" {
                         self.log.debug(textutils.serialize(w))
                         self.log.error("Could not find object for " .. tostring(w.self), "CCApplication")
                     else
-                        if w.func(self.objects[w.self], table.unpack(evd, 2)) then 
+                        --if w.func(self.objects[w.self], table.unpack(evd, 2)) then 
+                        if w.func(table.unpack(evd, 2)) then
                             redraws[w.self] = true
                             didEvent = true
                             break 

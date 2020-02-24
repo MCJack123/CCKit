@@ -23,7 +23,7 @@ function CCKitGlobalFunctions.deepcopy(orig)
     return copy
 end
 
-function table.combine(a, b)
+function CCKitGlobalFunctions.table_combine(a, b)
     if type(a) ~= "table" or type(b) ~= "table" then return nil end
     local orig_type = type(b)
     local copy = CCKitGlobalFunctions.deepcopy(a)
@@ -32,13 +32,6 @@ function table.combine(a, b)
     end
     setmetatable(copy, CCKitGlobalFunctions.deepcopy(getmetatable(b)))
     return copy
-end
-
-function CCKitGlobalFunctions.multipleInheritance(...)
-    local tables = { ... }
-    local retval = tables[1]
-    for k,v in ipairs(tables) do if k ~= 1 then retval = table.combine(retval, v) end end
-    return retval
 end
 
 -- Better serialize
@@ -113,7 +106,7 @@ local function serializeImpl( t, tTracking, sIndent )
     end
 end
 
-function textutils.serialize( t )
+function CCKitGlobalFunctions.serialize( t )
     local tTracking = {}
     return serializeImpl( t, tTracking, "" )
 end

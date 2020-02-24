@@ -5,47 +5,50 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
+local class = require "class"
 local CCKitGlobals = require "CCKitGlobals"
 local CCView = require "CCView"
 local CCLineBreakMode = require "CCLineBreakMode"
 local CCGraphics = require "CCGraphics"
 
-local function CCTextView(x, y, width, height)
-    local retval = CCView(x, y, width, height)
-    retval.textColor = CCKitGlobals.defaultTextColor
-    retval.text = ""
-    retval.lineBreakMode = CCLineBreakMode.byWordWrapping
-    function retval:draw()
+local function table_count(tab)
+    local i = 0
+    for k,v in pairs(tab) do i = i + 1 end
+    return i
+end
+
+return class "CCTextView" {extends = CCView} {
+    textColor = CCKitGlobals.defaultTextColor,
+    text = "",
+    lineBreakMode = CCLineBreakMode.byWordWrapping,
+    draw = function()
         if self.parentWindow ~= nil then
             CCGraphics.drawBox(self.window, 0, 0, self.frame.width, self.frame.height, self.backgroundColor, self.textColor)
             local lines = CCLineBreakMode.divideText(self.text, self.frame.width, self.lineBreakMode)
             --print(textutils.serialize(lines))
-            if table.count(lines) > self.frame.height then
+            if table_count(lines) > self.frame.height then
                 local newlines = {}
                 if bit.band(self.lineBreakMode, CCLineBreakMode.byTruncatingHead) then
-                    for i=table.count(lines)-self.frame.height,table.count(lines) do table.insert(newlines, lines[i]) end
+                    for i=table_count(lines)-self.frame.height,table_count(lines) do table.insert(newlines, lines[i]) end
                 else
-                    for i=1,table.count(lines) do table.insert(newlines, lines[i]) end
+                    for i=1,table_count(lines) do table.insert(newlines, lines[i]) end
                 end
                 lines = newlines
             end
             for k,v in pairs(lines) do CCGraphics.setString(self.window, 0, k-1, v) end
-            for k,v in pairs(self.subviews) do v:draw() end
+            for _,v in pairs(self.subviews) do v.draw() end
         end
-    end
-    function retval:setText(text)
+    end,
+    setText = function(text)
         self.text = text
-        self:draw()
-    end
-    function retval:setTextColor(color)
+        self.draw()
+    end,
+    setTextColor = function(color)
         self.textColor = color
-        self:draw()
-    end
-    function retval:setLineBreakMode(mode)
+        self.draw()
+    end,
+    setLineBreakMode = function(mode)
         self.lineBreakMode = mode
-        self:draw()
+        self.draw()
     end
-    return retval
-end
-
-return CCTextView
+}

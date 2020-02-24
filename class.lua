@@ -17,7 +17,11 @@
 ]]
 local metamethods = {__add=true, __sub=true, __mul=true, __div=true, __mod=true, __pow=true, __unm=true, __concat=true, __len=true, __eq=true, __lt=true, __le=true, __newindex=true, __call=true, __metatable=true}
 local function tabset(t, k, v) t[k] = v; return t end
-local function _wrap_method(obj, func, ...) return setfenv(func, tabset(tabset(getfenv(func), "self", obj), "super", setmetatable({}, {__index = getmetatable(obj).__index})))(...) end
+local function _wrap_method(obj, func, ...) 
+    local r = table.pack(setfenv(func, setmetatable({self = obj, super = setmetatable({}, {__index = getmetatable(obj).__index})}, {__index = getfenv(func)}))(...))
+    setfenv(func, getmetatable(getfenv(func)).__index)
+    return table.unpack(r, 1, r.n)
+end
 local function defineClass(name, meta, def)
     local c, cmt = {__class = name}, {}
     if def.static then for k,v in pairs(def.static) do if metamethods[k] then cmt[k] = v else c[k] = v end end end
@@ -27,13 +31,17 @@ local function defineClass(name, meta, def)
     def.__init = nil
     cmt.__call = function(self, ...)
         local omt, supers = {}, {}
+        omt.supers = supers --debug
         local obj = setmetatable({__class = name}, omt)
         if meta.extends and not __init then if meta.extends[1] then for i,v in ipairs(meta.extends) do supers[i] = v() end omt.__index = function(self, name) for i,v in ipairs(supers) do if v[name] then return v[name] end end end else omt.__index = meta.extends(...) end end
-        for k,v in pairs(def) do if type(v) == "function" then obj[k] = function(...) _wrap_method(obj, v, ...) end elseif k ~= "__class" then obj[k] = v end if metamethods[k] then omt[k] = obj[k]; obj[k] = nil end end
-        if __init then 
-            local env = tabset(tabset(getfenv(__init), "self", obj), "super", setmetatable({}, {__index = omt.__index}))
-            if meta.extends then if meta.extends[1] then omt.__index = function(self, name) if #supers < #meta.extends then for i,v in ipairs(meta.extends) do supers[i] = v() end end for i,v in ipairs(supers) do if v[name] then return v[name] end end end for i,v in ipairs(meta.extends) do env[v.__class] = function(...) supers[i] = v(...) end end else omt.__index = function(self, name) omt.__index = meta.extends(); return omt.__index[name] end env[meta.extends.__class] = function(...) omt.__index = meta.extends(...) end end end
+        for k,v in pairs(def) do if type(v) == "function" then obj[k] = function(...) return _wrap_method(obj, v, ...) end elseif k ~= "__class" then obj[k] = v end if metamethods[k] then omt[k] = obj[k]; obj[k] = nil end end
+        if __init then
+            local env = setmetatable({self = obj, super = setmetatable({}, {__index = omt.__index})}, {__index = getfenv(__init)})
+            env._ENV = env
+            if meta.extends then if meta.extends[1] then omt.__index = function(self, name) if #supers < #meta.extends then for i,v in ipairs(meta.extends) do if not supers[i] then supers[i] = v() end end end for i,v in ipairs(supers) do if v[name] then return v[name] end end end for i,v in ipairs(meta.extends) do env[v.__class] = function(...) supers[i] = v(...) end end else omt.__index = function(self, name) omt.__index = meta.extends(); return omt.__index[name] end env[meta.extends.__class] = function(...) omt.__index = meta.extends(...) end end end
             setfenv(__init, env)(...)
+            setfenv(__init, getmetatable(env).__index)
+            if meta.extends and #supers < #meta.extends then for i,v in ipairs(meta.extends) do if not supers[i] then supers[i] = v() end end end
             if meta.extends and meta.extends[1] then omt.__index = function(self, name) for i,v in ipairs(supers) do if v[name] then return v[name] end end end end
         end
         return obj

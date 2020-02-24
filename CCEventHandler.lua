@@ -15,11 +15,11 @@ for i = 48,  57 do table.insert(charset, string.char(i)) end
 for i = 65,  90 do table.insert(charset, string.char(i)) end
 for i = 97, 122 do table.insert(charset, string.char(i)) end
 
-function string.random(length)
+local function string_random(length)
     --math.randomseed(os.clock())
 
     if length > 0 then
-        return string.random(length - 1) .. charset[math.random(1, #charset)]
+        return string_random(length - 1) .. charset[math.random(1, #charset)]
     else
         return ""
     end
@@ -28,7 +28,7 @@ end
 return class "CCEventHandler" {
     hasEvents = true, -- for CCView compatibility
     __init = function(class)
-        self.name = string.random(8)
+        self.name = string_random(8)
         self.class = class
         self.events = {}
     end,

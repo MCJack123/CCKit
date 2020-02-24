@@ -6,30 +6,34 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
+local class = require "class"
 local CCKitGlobals = require "CCKitGlobals"
 local CCControl = require "CCControl"
 local CCGraphics = require "CCGraphics"
 
-local function CCRadioButton(x, y, text)
-    local size = 1
-    if type(text) == "string" then size = string.len(text) + 2 end
-    local retval = CCControl(x, y, size, 1)
-    retval.isOn = false
-    retval.text = text
-    retval.textColor = CCKitGlobals.defaultTextColor
-    retval.backgroundColor = CCKitGlobals.buttonColor
-    retval.class = "CCRadioButton"
-    retval.buttonId = 0
-    retval.groupName = nil
-    function retval:setOn(value)
+return class "CCRadioButton" {extends = CCControl} {
+    isOn = false,
+    class = "CCRadioButton",
+    buttonId = 0,
+    groupName = nil,
+    textColor = CCKitGlobals.defaultTextColor,
+    backgroundColor = CCKitGlobals.buttonColor,
+    __init = function(x, y, text)
+        local size = 1
+        if type(text) == "string" then size = string.len(text) + 2 end
+        _ENV.CCControl(x, y, size, 1)
+        self.text = text
+        self.setAction(self.action, self)
+    end,
+    setOn = function(value)
         self.isOn = value
-        self:draw()
-    end
-    function retval:setTextColor(color)
+        self.draw()
+    end,
+    setTextColor = function(color)
         self.textColor = color
-        self:draw()
-    end
-    function retval:draw()
+        self.draw()
+    end,
+    draw = function()
         if self.parentWindow ~= nil then
             local textColor
             local backgroundColor
@@ -40,21 +44,17 @@ local function CCRadioButton(x, y, text)
             else backgroundColor = self.backgroundColor end
             if self.isEnabled then textColor = self.textColor else textColor = CCKitGlobals.buttonDisabledTextColor end
             CCGraphics.drawBox(self.window, 0, 0, 1, 1, backgroundColor, textColor)
-            if retval.isOn then CCGraphics.setCharacter(self.window, 0, 0, string.char(7))
+            if self.isOn then CCGraphics.setCharacter(self.window, 0, 0, string.char(7))
             else CCGraphics.setCharacter(self.window, 0, 0, string.char(0xBA)) end
-            if retval.text ~= nil then 
+            if self.text ~= nil then 
                 CCGraphics.drawBox(self.window, 1, 0, string.len(self.text) + 1, 1, CCKitGlobals.windowBackgroundColor, textColor)
                 CCGraphics.setString(self.window, 2, 0, self.text)
             end
-            for k,v in pairs(self.subviews) do v:draw() end
+            for _,v in pairs(self.subviews) do v.draw() end
         end
-    end
-    function retval:action()
-        self:setOn(true)
+    end,
+    action = function()
+        self.setOn(true)
         os.queueEvent("radio_selected", self.groupName, self.buttonId)
     end
-    retval:setAction(retval.action, retval)
-    return retval
-end
-
-return CCRadioButton
+}

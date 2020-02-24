@@ -20,7 +20,7 @@ return class "CCLabel" {extends = CCView} {
         if self.parentWindow ~= nil then
             for px=0,self.frame.width-1 do CCGraphics.setPixelColors(self.window, px, 0, self.textColor, self.backgroundColor) end
             CCGraphics.setString(self.window, 0, 0, self.text)
-            for k,v in pairs(self.subviews) do v:draw() end
+            for k,v in pairs(self.subviews) do v.draw() end
         end
     end
 }

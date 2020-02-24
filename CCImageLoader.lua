@@ -23,7 +23,9 @@ local function loadCCG(inputf)
     for v in inputIter(inputf) do
         retval = retval .. v .. "\n"
     end
-    return textutils.unserialize(retval)
+    local i = textutils.unserialize(retval)
+    if i == nil then error("Image is nil") end
+    return i
 end
 
 local function loadNFP(inputf)

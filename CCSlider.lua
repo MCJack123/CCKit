@@ -6,50 +6,56 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
+local class = require "class"
 local CCKitGlobals = require "CCKitGlobals"
 local CCControl = require "CCControl"
 local CCGraphics = require "CCGraphics"
 local CCWindowRegistry = require "CCWindowRegistry"
 
-local function CCSlider(x, y, width)
-    local retval = CCControl(x, y, width, 1)
-    retval.value = 0.0
-    retval.minimumValue = 0.0
-    retval.maximumValue = 100.0
-    retval.minimumColor = CCKitGlobals.buttonHighlightedColor
-    retval.maximumColor = CCKitGlobals.buttonColor
-    retval.buttonColor = CCKitGlobals.buttonColor
-    retval.sliderValue = 0
-    function retval:setValue(value)
+return class "CCSlider" {extends = CCControl} {
+    value = 0.0,
+    minimumValue = 0.0,
+    maximumValue = 100.0,
+    minimumColor = CCKitGlobals.buttonHighlightedColor,
+    maximumColor = CCKitGlobals.buttonColor,
+    buttonColor = CCKitGlobals.buttonColor,
+    sliderValue = 0,
+    __init = function(x, y, width)
+        _ENV.CCControl(x, y, width, 1)
+        self.setAction(function() return end, self)
+        self.addEvent("mouse_click", self.onMouseDown)
+        self.addEvent("mouse_drag", self.onDrag)
+    end,
+    setValue = function(value)
         self.value = value
         self.sliderValue = ((self.frame.width - 1) * (self.minimumValue - self.value)) / (self.maximumValue - self.minimumValue)
-        self:draw()
-    end
-    function retval:onMouseDown(button, px, py)
+        self.draw()
+    end,
+    onMouseDown = function(button, px, py)
         if not CCWindowRegistry.rayTest(self.application.objects[self.parentWindowName], px, py) then return false end
         local bx = self.frame.absoluteX
         local by = self.frame.absoluteY
         if px >= bx and py >= by and px < bx + self.frame.width and py < by + self.frame.height and button == 1 and self.isEnabled then 
             self.isSelected = true
-            self:onDrag(button, px, py)
+            self.onDrag(button, px, py)
             return true
         end
         return false
-    end
-    function retval:onDrag(button, px, py)
+    end,
+    onDrag = function(button, px, py)
         --if not CCWindowRegistry.rayTest(self.application.objects[self.parentWindowName], px, py) then return false end
         if self.isSelected and button == 1 then
             if px < self.frame.absoluteX then self.sliderValue = 0
             elseif px > self.frame.absoluteX + self.frame.width - 1 then self.sliderValue = self.frame.width - 1
             else self.sliderValue = px - self.frame.absoluteX end
             self.value = self.sliderValue * ((self.maximumValue - self.minimumValue) / (self.frame.width - 1)) + self.minimumValue
-            self:draw()
+            self.draw()
             os.queueEvent("slider_dragged", self.name, self.value)
             return true
         end
         return false
-    end
-    function retval:draw()
+    end,
+    draw = function()
         if self.parentWindow ~= nil then
             local i = 0
             while i < self.frame.width do
@@ -68,13 +74,7 @@ local function CCSlider(x, y, width)
                 end
                 i = i + 1
             end
-            for k,v in pairs(self.subviews) do v:draw() end
+            for _,v in pairs(self.subviews) do v.draw() end
         end
     end
-    retval:setAction(function() return end, retval)
-    retval:addEvent("mouse_click", retval.onMouseDown)
-    retval:addEvent("mouse_drag", retval.onDrag)
-    return retval
-end
-
-return CCSlider
+}

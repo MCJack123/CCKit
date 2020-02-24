@@ -6,17 +6,20 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
+local class = require "class"
 local CCKitGlobals = require "CCKitGlobals"
 local CCGraphics = require "CCGraphics"
 local CCView = require "CCView"
 
-local function CCProgressBar(x, y, width)
-    local retval = CCView(x, y, width, 1)
-    retval.backgroundColor = colors.lightGray
-    retval.foregroundColor = colors.yellow
-    retval.progress = 0.0
-    retval.indeterminate = false
-    function retval:draw()
+return class "CCProgressBar" {extends = CCView} {
+    backgroundColor = colors.lightGray,
+    foregroundColor = colors.yellow,
+    progress = 0.0,
+    indeterminate = false,
+    __init = function(x, y, width)
+        _ENV.CCView(x, y, width, 1)
+    end,
+    draw = function()
         if self.parentWindow ~= nil then
             if self.indeterminate then
                 local i = 0
@@ -30,19 +33,16 @@ local function CCProgressBar(x, y, width)
                 CCGraphics.drawLine(self.window, 0, 0, self.frame.width, false, self.backgroundColor)
                 CCGraphics.drawLine(self.window, 0, 0, math.floor(self.frame.width * self.progress), false, self.foregroundColor)
             end
-            for k,v in pairs(self.subviews) do v:draw() end
+            for k,v in pairs(self.subviews) do v.draw() end
         end
-    end
-    function retval:setProgress(progress)
+    end,
+    setProgress = function(progress)
         if progress > 1 then progress = 1 end
         self.progress = progress
-        self:draw()
-    end
-    function retval:setIndeterminate(id)
+        self.draw()
+    end,
+    setIndeterminate = function(id)
         self.indeterminate = id
-        self:draw()
+        self.draw()
     end
-    return retval
-end
-
-return CCProgressBar
+}

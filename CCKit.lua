@@ -42,16 +42,16 @@ function CCKit.CCMain(initX, initY, initWidth, initHeight, title, vcClass, backg
     local name = title
     if appName ~= nil then name = appName end
     local app = CCKit.CCApplication(name)
-    app:setBackgroundColor(backgroundColor)
+    app.setBackgroundColor(backgroundColor)
     app.showName = showName or false
     local win = CCKit.CCWindow(initX, initY, initWidth, initHeight)
-    win:setTitle(title)
+    win.setTitle(title)
     local vc = vcClass()
-    win:setViewController(vc, app)
-    app:registerObject(win, win.name)
+    win.setViewController(vc, app)
+    app.registerObject(win, win.name)
     app.isApplicationRunning = true
     term.setCursorBlink(false)
-    pcall(function() app:runLoop() end)
+    pcall(function() app.runLoop() end)
     CCKit.CCWindowRegistry.deregisterApplication(app.name)
     if not forked then
         while table.maxn(_G.windowRegistry.zPos) > 0 do coroutine.yield() end

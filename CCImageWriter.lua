@@ -65,7 +65,7 @@ return class "CCImageWriter" {
         if self.type == CCImageType.ccg then self.fileHandle.write(writeCCG(image))
         elseif self.type == CCImageType.nfp then self.fileHandle.write(writeNFP(image))
         else
-            CCLog.default:error(self.fileName, "File type " .. tostring(self.type) .. " not supported yet", "CCImageWriter", 94)
+            CCLog.default.error(self.fileName, "File type " .. tostring(self.type) .. " not supported yet", "CCImageWriter", 94)
             return {width = 0, height = 0, termWidth = 0, termHeight = 0}
         end
     end,

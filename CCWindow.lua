@@ -6,6 +6,7 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
+local class = require "class"
 local CCKitGlobals = require "CCKitGlobals"
 local CCGraphics = require "CCGraphics"
 local CCEventHandler = require "CCEventHandler"
@@ -21,64 +22,72 @@ for i = 48,  57 do table.insert(charset, string.char(i)) end
 for i = 65,  90 do table.insert(charset, string.char(i)) end
 for i = 97, 122 do table.insert(charset, string.char(i)) end
 
-function string.random(length)
+local function string_random(length)
   --math.randomseed(os.clock())
 
   if length > 0 then
-    return string.random(length - 1) .. charset[math.random(1, #charset)]
+    return string_random(length - 1) .. charset[math.random(1, #charset)]
   else
     return ""
   end
 end
 
-local function CCWindow(x, y, width, height)
-    local retval = CCEventHandler("CCWindow")
-    retval.window = window.create(term.native(), x, y, width, height)
-    retval.title = ""
-    retval.frame = {}
-    retval.frame.x = x
-    retval.frame.y = y
-    retval.frame.width = width
-    retval.frame.height = height
-    retval.defaultFrame = {}
-    retval.defaultFrame.x = retval.frame.x
-    retval.defaultFrame.y = retval.frame.y
-    retval.defaultFrame.width = retval.frame.width
-    retval.defaultFrame.height = retval.frame.height
-    retval.viewController = nil
-    retval.isDragging = false
-    retval.mouseOffset = 0
-    retval.repaintColor = colors.black
-    retval.application = nil
-    retval.closing = false
-    retval.maximized = false
-    retval.maximizable = true
-    retval.showTitleBar = true
-    function retval:redrawTitleBar()
+return class "CCWindow" {extends = CCEventHandler} {
+    title = "",
+    viewController = nil,
+    isDragging = false,
+    mouseOffset = 0,
+    repaintColor = colors.black,
+    application = nil,
+    closing = false,
+    maximized = false,
+    maximizable = true,
+    showTitleBar = true,
+    __init = function(x, y, width, height)
+        _ENV.CCEventHandler("CCWindow")
+        self.window = window.create(term.native(), x, y, width, height)
+        self.frame = {}
+        self.frame.x = x
+        self.frame.y = y
+        self.frame.width = width
+        self.frame.height = height
+        self.defaultFrame = {}
+        self.defaultFrame.x = self.frame.x
+        self.defaultFrame.y = self.frame.y
+        self.defaultFrame.width = self.frame.width
+        self.defaultFrame.height = self.frame.height
+        self.addEvent("mouse_drag", self.moveToPos)
+        self.addEvent("mouse_click", self.startDrag)
+        self.addEvent("mouse_up", self.stopDrag)
+        self.addEvent("mouse_scroll", self.scroll)
+        CCGraphics.initGraphics(self.window)
+        self.redraw()
+    end,
+    redrawTitleBar = function()
         if self.showTitleBar then
             local color = (self.application ~= nil and not CCWindowRegistry.isWinOnTop(self)) and CCKitGlobals.inactiveTitleBarColor or CCKitGlobals.titleBarColor
-            CCGraphics.drawLine(retval.window, 0, 0, self.frame.width-1, false, color, CCKitGlobals.titleBarTextColor)
-            CCGraphics.setPixelColors(retval.window, self.frame.width-1, 0, colors.white, colors.red)
-            CCGraphics.setCharacter(retval.window, self.frame.width-1, 0, "X")
+            CCGraphics.drawLine(self.window, 0, 0, self.frame.width-1, false, color, CCKitGlobals.titleBarTextColor)
+            CCGraphics.setPixelColors(self.window, self.frame.width-1, 0, colors.white, colors.red)
+            CCGraphics.setCharacter(self.window, self.frame.width-1, 0, "X")
             if self.maximizable then
-                CCGraphics.setPixelColors(retval.window, self.frame.width-2, 0, colors.white, colors.lime)
-                if self.maximized then CCGraphics.setCharacter(retval.window, self.frame.width-2, 0, "o")
-                else CCGraphics.setCharacter(retval.window, self.frame.width-2, 0, "O") end
+                CCGraphics.setPixelColors(self.window, self.frame.width-2, 0, colors.white, colors.lime)
+                if self.maximized then CCGraphics.setCharacter(self.window, self.frame.width-2, 0, "o")
+                else CCGraphics.setCharacter(self.window, self.frame.width-2, 0, "O") end
             end
         else
-            CCGraphics.drawLine(retval.window, 0, 0, self.frame.width, false, CCKitGlobals.windowBackgroundColor)
+            CCGraphics.drawLine(self.window, 0, 0, self.frame.width, false, CCKitGlobals.windowBackgroundColor)
         end
-        self:setTitle(self.title)
-    end
-    function retval:redraw(setapp, fullRedraw)
+        self.setTitle(self.title)
+    end,
+    redraw = function(setapp, fullRedraw)
         if setapp == nil then setapp = true end
         if fullRedraw == nil then fullRedraw = true end
         if not self.closing then
             self.window.setCursorBlink(false)
-            self:redrawTitleBar()
+            self.redrawTitleBar()
             if fullRedraw then
-                CCGraphics.drawBox(retval.window, 0, 1, self.frame.width, self.frame.height - 1, CCKitGlobals.windowBackgroundColor)
-                if self.viewController ~= nil then self.viewController.view:draw() end
+                CCGraphics.drawBox(self.window, 0, 1, self.frame.width, self.frame.height - 1, CCKitGlobals.windowBackgroundColor)
+                if self.viewController ~= nil then self.viewController.view.draw() end
             end
             if self.application ~= nil and setapp then 
                 CCWindowRegistry.setAppTop(self.application.name)
@@ -87,12 +96,12 @@ local function CCWindow(x, y, width, height)
                 --os.pullEvent("redraw_all")
             end
         end
-    end
-    function retval:moveToPos(button, px, py)
+    end,
+    moveToPos = function(button, px, py)
         --print("moving")
         if button == 1 and self.isDragging then
             if not CCWindowRegistry.isWinOnTop(self) or not CCWindowRegistry.isAppOnTop(self.application.name) then 
-                self:redraw() 
+                self.redraw() 
                 CCWindowRegistry.setAppTop(self.application.name)
                 CCWindowRegistry.setWinTop(self)
             end
@@ -104,14 +113,14 @@ local function CCWindow(x, y, width, height)
             CCWindowRegistry.moveWin(self, px - self.mouseOffset, py)
             --self.window.setVisible(false)
             self.window.reposition(px - self.mouseOffset, py)
-            if self.viewController ~= nil then self.viewController.view:updateAbsolutes(px - self.frame.x - self.mouseOffset, py - self.frame.y) end
+            if self.viewController ~= nil then self.viewController.view.updateAbsolutes(px - self.frame.x - self.mouseOffset, py - self.frame.y) end
             --CCGraphics.redrawScreen(self.window)
-            --self:redraw(true, false)
-            self:redrawTitleBar()
+            --self.redraw(true, false)
+            self.redrawTitleBar()
             CCGraphics.drawFilledBox(self.frame.x, self.frame.y, self.frame.x + self.frame.width, self.frame.y + self.frame.height, self.repaintColor)
             self.frame.x = px - self.mouseOffset
             self.frame.y = py
-            if not CCKitGlobals.liveWindowMove then 
+            if not CCKitGlobals.liveWindowMove then
                 paintutils.drawBox(self.frame.x, self.frame.y, self.frame.x + self.frame.width - 1, self.frame.y + self.frame.height - 1, CCKitGlobals.windowBackgroundColor)
             else
                 --self.window.setVisible(true)
@@ -120,12 +129,12 @@ local function CCWindow(x, y, width, height)
             return true
         end
         return false
-    end
-    function retval:startDrag(button, px, py)
+    end,
+    startDrag = function(button, px, py)
         if not CCWindowRegistry.rayTest(self, px, py) then return false end
         if button == 1 then
             if not CCWindowRegistry.isWinOnTop(self) or not CCWindowRegistry.isAppOnTop(self.application.name) then
-                self:redraw()
+                self.redraw()
                 CCWindowRegistry.setAppTop(self.application.name)
                 CCWindowRegistry.setWinTop(self)
             end
@@ -141,8 +150,8 @@ local function CCWindow(x, y, width, height)
                     self.frame.width = self.defaultFrame.width
                     self.frame.height = self.defaultFrame.height
                     self.maximized = false
-                    self:resize(self.frame.width, self.frame.height)
-                    self.application:setBackgroundColor(self.application.backgroundColor)
+                    self.resize(self.frame.width, self.frame.height)
+                    self.application.setBackgroundColor(self.application.backgroundColor)
                 else
                     self.defaultFrame.x = self.frame.x
                     self.defaultFrame.y = self.frame.y
@@ -151,87 +160,78 @@ local function CCWindow(x, y, width, height)
                     self.frame.x = 1
                     self.frame.y = 1
                     self.maximized = true
-                    self:resize(term.native().getSize())
+                    self.resize(term.native().getSize())
                 end
-                self.application.log:debug(tostring(self.defaultFrame.width))
+                self.application.log.debug(tostring(self.defaultFrame.width))
                 return true
             elseif py == self.frame.y and px == self.frame.x + self.frame.width - 1 then
                 CCGraphics.endGraphics(self.window)
                 self.window = nil
                 self.closing = true
                 if self.viewController ~= nil then for k,v in pairs(self.viewController.view.subviews) do
-                    self.viewController.view:deregisterSubview(v)
+                    self.viewController.view.deregisterSubview(v)
                 end end
                 os.queueEvent("closed_window", self.name)
                 return true
             end
         end
         return false
-    end
-    function retval:stopDrag(button, px, py)
+    end,
+    stopDrag = function(button, px, py)
         --if not CCWindowRegistry.rayTest(self, px, py) then return false end
         if button == 1 and self.isDragging then 
             if not CCWindowRegistry.isWinOnTop(self) or not CCWindowRegistry.isAppOnTop(self.application.name) then 
-                self:redraw() 
+                self.redraw() 
                 CCWindowRegistry.setAppTop(self.application.name)
                 CCWindowRegistry.setWinTop(self)
             end
-            self:moveToPos(button, px, py) 
+            self.moveToPos(button, px, py)
             self.isDragging = false
             self.window.setVisible(true)
             return true
         end
         return false
-    end
-    function retval:scroll(direction, px, py)
-        if CCWindowRegistry.rayTest(self, px, py) and (not CCWindowRegistry.isWinOnTop(self) or not CCWindowRegistry.isAppOnTop(self.application.name)) then 
-            self:redraw() 
+    end,
+    scroll = function(direction, px, py)
+        if CCWindowRegistry.rayTest(self, px, py) and (not CCWindowRegistry.isWinOnTop(self) or not CCWindowRegistry.isAppOnTop(self.application.name)) then
+            self.redraw() 
             CCWindowRegistry.setAppTop(self.application.name)
             CCWindowRegistry.setWinTop(self)
         end
         return false
-    end
-    function retval:resize(newWidth, newHeight)
+    end,
+    resize = function(newWidth, newHeight)
         self.frame.width = newWidth
         self.frame.height = newHeight
         self.window.reposition(self.frame.x, self.frame.y, self.frame.width, self.frame.height)
         CCGraphics.resizeWindow(self.window, newWidth, newHeight)
         CCWindowRegistry.resizeWin(self, newWidth, newHeight)
-        self:redraw()
-    end
-    function retval:setTitle(str)
+        self.redraw()
+    end,
+    setTitle = function(str)
         self.title = str
         CCGraphics.setString(self.window, math.floor((self.frame.width - string.len(str)) / 2), 0, str)
-    end
-    function retval:setViewController(vc, app)
+    end,
+    setViewController = function(vc, app)
         self.viewController = vc
         self.application = app
-        CCWindowRegistry.registerWindow(retval)
-        self.viewController:loadView(self, self.application)
-        self.viewController:viewDidLoad()
-        self.viewController.view:draw()
-        self:redraw()
-    end
-    function retval:registerObject(obj)
+        CCWindowRegistry.registerWindow(self)
+        self.viewController.loadView(self, self.application)
+        self.viewController.viewDidLoad()
+        self.viewController.view.draw()
+        self.redraw()
+    end,
+    registerObject = function(obj)
         if self.application ~= nil then
-            self.application:registerObject(obj, obj.name, false)
+            self.application.registerObject(obj, obj.name, false)
         end
-    end
-    function retval:close()
-        if self.viewController ~= nil then self.viewController:dismiss() end
+    end,
+    close = function()
+        if self.viewController ~= nil then self.viewController.dismiss() end
         os.queueEvent("closed_window", self.name)
+    end,
+    present = function(newwin)
+        newwin.redraw()
+        self.application.registerObject(newwin, newwin.name)
     end
-    function retval:present(newwin)
-        newwin:redraw()
-        self.application:registerObject(newwin, newwin.name)
-    end
-    retval:addEvent("mouse_drag", retval.moveToPos)
-    retval:addEvent("mouse_click", retval.startDrag)
-    retval:addEvent("mouse_up", retval.stopDrag)
-    retval:addEvent("mouse_scroll", retval.scroll)
-    CCGraphics.initGraphics(retval.window)
-    retval:redraw()
-    return retval
-end
-
-return CCWindow
+}
