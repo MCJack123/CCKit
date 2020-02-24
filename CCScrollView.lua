@@ -97,7 +97,7 @@ end
 
 local function math_round(num) if num % 1 < 0.5 then return math.floor(num) else return math.ceil(num) end end
 
-return class "CCScrollView" {extends = {CCView, CCEventHandler}} {
+return class "CCScrollView" {extends = {CCEventHandler, CCView}} {
     currentOffset = 0,
     lastAbsolute = 0,
     __init = function(x, y, width, height, innerHeight)

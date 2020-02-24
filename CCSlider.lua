@@ -25,6 +25,7 @@ return class "CCSlider" {extends = CCControl} {
         self.setAction(function() return end, self)
         self.addEvent("mouse_click", self.onMouseDown)
         self.addEvent("mouse_drag", self.onDrag)
+        self.addEvent("mouse_up", self.onMouseUp)
     end,
     setValue = function(value)
         self.value = value
@@ -54,6 +55,13 @@ return class "CCSlider" {extends = CCControl} {
             return true
         end
         return false
+    end,
+    onMouseUp = function(button, px, py)
+        if self.isSelected and button == 1 then 
+            self.isSelected = false
+            self.draw()
+            return true 
+        end
     end,
     draw = function()
         if self.parentWindow ~= nil then

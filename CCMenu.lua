@@ -6,7 +6,7 @@ local CCGraphics = require "CCGraphics"
 local CCEventHandler = require "CCEventHandler"
 local CCWindowRegistry = require "CCWindowRegistry"
 
-local CCContextMenuView = class "CCContextMenuView" {extends = {CCView, CCEventHandler}} {
+local CCContextMenuView = class "CCContextMenuView" {extends = {CCEventHandler, CCView}} {
     didSelect = false,
     __init = function(x, y, menu)
         local maxw = menu.minimumWidth

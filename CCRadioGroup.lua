@@ -11,7 +11,7 @@ local CCKitGlobals = require "CCKitGlobals"
 local CCView = require "CCView"
 local CCEventHandler = require "CCEventHandler"
 
-return class "CCRadioGroup" {extends = {CCView, CCEventHandler}} {
+return class "CCRadioGroup" {extends = {CCEventHandler, CCView}} {
     selectedId = -1,
     nextId = 0,
     hasEvents = true,

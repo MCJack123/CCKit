@@ -14,7 +14,7 @@ local CCWindowRegistry = require "CCWindowRegistry"
 
 self, super = nil
 
-return class "CCControl" {extends = {CCView, CCEventHandler}} {
+return class "CCControl" {extends = {CCEventHandler, CCView}} {
     hasEvents = true,
     isEnabled = true,
     isSelected = false,

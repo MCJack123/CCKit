@@ -12,7 +12,7 @@ local CCView = require "CCView"
 local CCGraphics = require "CCGraphics"
 local CCWindowRegistry = require "CCWindowRegistry"
 
-return class "CCTextField" {extends = {CCView, CCEventHandler}} {
+return class "CCTextField" {extends = {CCEventHandler, CCView}} {
     text = "",
     isSelected = false,
     isEnabled = true,
