@@ -5,7 +5,7 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-local CCKitGlobals = require "CCKitGlobals"
+local class = require "class"
 local CCLog = require "CCLog"
 --if _G._PID ~= nil then loadAPI("CCKernel") end
 local CCWindowRegistry = require("CCWindowRegistry")
@@ -45,34 +45,37 @@ function string.random(length)
   end
 end
 
-local function CCApplication(name)
-    local retval = {}
-    term.setBackgroundColor(colors.black)
-    retval.name = string.random(8)
-    retval.class = "CCApplication"
-    retval.objects = {count = 0}
-    retval.events = {}
-    retval.isApplicationRunning = false
-    retval.backgroundColor = colors.black
-    retval.objectOrder = {}
-    retval.applicationName = name
-    retval.showName = false
-    if name ~= nil then retval.log = CCLog(name)
-    else retval.log = CCLog.default end
-    CCLog.default.logToConsole = false
-    retval.log:open()
-    function retval:setBackgroundColor(color)
+self = nil -- silences errors
+
+return class "CCApplication" {
+    isApplicationRunning = false,
+    backgroundColor = colors.black,
+    showName = false,
+    __init = function(name)
+        term.setBackgroundColor(colors.black)
+        self.name = string.random(8)
+        self.objects = {count = 0}
+        self.events = {}
+        self.objectOrder = {}
+        self.applicationName = name
+        if name ~= nil then self.log = CCLog(name)
+        else self.log = CCLog.default end
+        CCLog.default.logToConsole = false
+        self.log.open()
+        CCWindowRegistry.registerApplication(self.name)
+    end,
+    setBackgroundColor = function(color)
         self.backgroundColor = color
         term.setBackgroundColor(color)
         term.setCursorPos(1, 1)
         term.clear()
         term.clear()
-        for k,v in pairs(self.objects) do if k ~= "count" and v.class == "CCWindow" then v:redraw() end end
-    end
-    function retval:registerObject(win, name, up) -- adds the events in the object to the run loop
+        for k,v in pairs(self.objects) do if k ~= "count" and v.class == "CCWindow" then v.redraw() end end
+    end,
+    registerObject = function(win, name, up) -- adds the events in the object to the run loop
         --if win.class ~= "CCWindow" then error("tried to register non-CCWindow type " .. win.class, 2) end
         if win == nil then 
-            self.log:error("win is nil") 
+            self.log.error("win is nil")
             return
         end
         if up == nil then up = true end
@@ -91,16 +94,16 @@ local function CCApplication(name)
         end
         --print(textutils.serialize(self.events))
         --print(i)
-    end
-    function retval:deregisterObject(name)
+    end,
+    deregisterObject = function(name)
         self.objects[name] = nil
         local remove = {}
         for k,v in pairs(self.events) do for l,w in pairs(v) do if w.self == name then table.insert(remove, {f = k, s = l}) end end end
         for a,b in pairs(remove) do self.events[b.f][b.s] = nil end
-    end
-    function retval:runLoop()
+    end,
+    runLoop = function()
         --print("starting loop")
-        self.log:open()
+        self.log.open()
         if _G.windowRegistry[self.name] == nil then CCWindowRegistry.registerApplication(self.name) end
         if CCKernel ~= nil then CCKernel.broadcast("redraw_all", self.name, true) end
         while self.isApplicationRunning do
@@ -117,7 +120,7 @@ local function CCApplication(name)
             --print("recieved event " .. ev)
             if ev == "closed_window" then
                 if self.objects[p1] == nil or self.objects[p1].class ~= "CCWindow" then 
-                    self.log:error("Missing window for " .. p1, "CCApplication")
+                    self.log.error("Missing window for " .. p1, "CCApplication")
                 else
                     drawFilledBox(self.objects[p1].frame.x, self.objects[p1].frame.y, self.objects[p1].frame.width, self.objects[p1].frame.height, self.backgroundColor)
                     CCWindowRegistry.setAppTop(self.name)
@@ -132,9 +135,9 @@ local function CCApplication(name)
                     for k,v in pairs(self.objectOrder) do if self.objects[v] ~= nil and self.objects[v].class == "CCWindow" and self.objects[v].window ~= nil then self.objects[v].window.redraw() end end 
                 end
             elseif ev == "redraw_window" then
-                if self.objects[p1] ~= nil and self.objects[p1].redraw ~= nil then self.objects[p1]:redraw() end
+                if self.objects[p1] ~= nil and self.objects[p1].redraw ~= nil then self.objects[p1].redraw() end
             elseif ev == "redraw_all" then
-                if p1 ~= self.name then for k,v in pairs(self.objectOrder) do if self.objects[v] ~= nil and self.objects[v].class == "CCWindow" and self.objects[v].window ~= nil then self.objects[v]:redraw(false) end end
+                if p1 ~= self.name then for k,v in pairs(self.objectOrder) do if self.objects[v] ~= nil and self.objects[v].class == "CCWindow" and self.objects[v].window ~= nil then self.objects[v].redraw(false) end end
                 elseif p2 == true then CCWindowRegistry.setAppTop(self.name) end
             end
             local didEvent = false
@@ -144,8 +147,8 @@ local function CCApplication(name)
                 --print(textutils.serialize(v))
                 for l,w in ipairs(v) do 
                     if self.objects[w.self] == nil then 
-                        self.log:debug(textutils.serialize(w))
-                        self.log:error("Could not find object for " .. tostring(w.self), "CCApplication")
+                        self.log.debug(textutils.serialize(w))
+                        self.log.error("Could not find object for " .. tostring(w.self), "CCApplication")
                     else
                         if w.func(self.objects[w.self], table.unpack(evd, 2)) then 
                             redraws[w.self] = true
@@ -160,20 +163,16 @@ local function CCApplication(name)
             end
         end
         --print("ending loop")
-        self.log:close()
+        self.log.close()
         CCWindowRegistry.deregisterApplication(self.name)
         coroutine.yield()
-    end
-    function retval:startRunLoop()
+    end,
+    startRunLoop = function()
         self.coro = coroutine.create(self.runLoop)
         self.isApplicationRunning = true
         coroutine.resume(self.coro, self)
-    end
-    function retval:stopRunLoop()
+    end,
+    stopRunLoop = function()
         self.isApplicationRunning = false
     end
-    CCWindowRegistry.registerApplication(retval.name)
-    return retval
-end
-
-return CCApplication
+}

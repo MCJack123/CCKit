@@ -6,6 +6,7 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
+local class = require "class"
 local CCKitGlobals = require "CCKitGlobals"
 local CCLog = require "CCLog"
 local CCImageType = require "CCImageType"
@@ -41,13 +42,12 @@ local function writeNFP(image)
     return retval
 end
 
-local function CCImageWriter()
-    local retval = {}
-    retval.fileHandle = nil
-    retval.isOpen = false
-    retval.type = CCImageType.none
-    retval.fileName = nil
-    function retval:open(file)
+return class "CCImageWriter" {
+    fileHandle = nil,
+    isOpen = false,
+    type = CCImageType.none,
+    fileName = nil,
+    open = function(file)
         self.fileHandle = fs.open(file, "w")
         if self.fileHandle == nil then return -1 end
         self.isOpen = true
@@ -59,8 +59,8 @@ local function CCImageWriter()
         elseif string.find(file, ".gif") ~= nil then self.type = CCImageType.gif
         else return 1 end
         return 0
-    end
-    function retval:write(image)
+    end,
+    write = function(image)
         if not self.isOpen or self.type == CCImageType.none then return {width = 0, height = 0, termWidth = 0, termHeight = 0} end
         if self.type == CCImageType.ccg then self.fileHandle.write(writeCCG(image))
         elseif self.type == CCImageType.nfp then self.fileHandle.write(writeNFP(image))
@@ -68,15 +68,12 @@ local function CCImageWriter()
             CCLog.default:error(self.fileName, "File type " .. tostring(self.type) .. " not supported yet", "CCImageWriter", 94)
             return {width = 0, height = 0, termWidth = 0, termHeight = 0}
         end
-    end
-    function retval:close()
+    end,
+    close = function()
         self.fileHandle.close()
         self.isOpen = false
         self.type = CCImageType.none
         self.fileName = nil
         self.fileHandle = nil
     end
-    return retval
-end
-
-return CCImageWriter
+}

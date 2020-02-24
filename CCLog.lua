@@ -7,6 +7,8 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
+local class = require "class"
+
 function string.trim(s)
     return string.match(s,'^()%s*$') and '' or string.match(s,'^%s*(.*%S)')
 end  
@@ -41,21 +43,22 @@ end
 
 local default = {}
 
-local function CCLog(name)
-    local retval = {}
-    retval.name = name
-    retval.fileDescriptor = nil
-    retval.showInDefaultLog = true
-    retval.shell = nil
-    function retval:open()
+local CCLog = class "CCLog" {
+    fileDescriptor = nil,
+    showInDefaultLog = true,
+    shell = nil,
+    __init = function(name)
+        self.name = name
+    end,
+    open = function()
         if self.fileDescriptor == nil then
-            self.fileDescriptor = fs.open("CCKit/logs/" .. retval.name .. ".log", fs.exists("CCKit/logs/" .. retval.name .. ".log") and "a" or "w")
+            self.fileDescriptor = fs.open("CCKit/logs/" .. self.name .. ".log", fs.exists("CCKit/logs/" .. self.name .. ".log") and "a" or "w")
             if self.fileDescriptor == nil then error("Could not open log file") end
-            self.fileDescriptor.write("=== Logging for " .. name .. " started at " .. dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " ===\n")
+            self.fileDescriptor.write("=== Logging for " .. self.name .. " started at " .. dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " ===\n")
             self.fileDescriptor.flush()
         end
-    end
-    function retval:debug(text, class, lineno)
+    end,
+    debug = function(text, class, lineno)
         if self == nil then error("No self") end
         self.fileDescriptor.write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Debug] ")
         if class ~= nil then 
@@ -68,8 +71,8 @@ local function CCLog(name)
         if (self.showInDefaultLog) then 
             default:debug(self.name, text, class, lineno) 
         end
-    end
-    function retval:log(text, class, lineno)
+    end,
+    log = function(text, class, lineno)
         self.fileDescriptor.write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Default] ")
         if class ~= nil then 
             self.fileDescriptor.write(class)
@@ -81,8 +84,8 @@ local function CCLog(name)
         if (self.showInDefaultLog) then 
             default:log(self.name, text, class, lineno) 
         end
-    end
-    function retval:warn(text, class, lineno)
+    end,
+    warn = function(text, class, lineno)
         self.fileDescriptor.write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Warning] ")
         if class ~= nil then 
             self.fileDescriptor.write(class)
@@ -94,8 +97,8 @@ local function CCLog(name)
         if (self.showInDefaultLog) then 
             default:warn(self.name, text, class, lineno) 
         end
-    end
-    function retval:error(text, class, lineno)
+    end,
+    error = function(text, class, lineno)
         self.fileDescriptor.write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Error] ")
         if class ~= nil then 
             self.fileDescriptor.write(class)
@@ -107,8 +110,8 @@ local function CCLog(name)
         if (self.showInDefaultLog) then 
             default:error(self.name, text, class, lineno) 
         end
-    end
-    function retval:critical(text, class, lineno)
+    end,
+    critical = function(text, class, lineno)
         self.fileDescriptor.write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Critical] ")
         if class ~= nil then 
             self.fileDescriptor.write(class)
@@ -120,8 +123,8 @@ local function CCLog(name)
         if (self.showInDefaultLog) then 
             default:critical(self.name, text, class, lineno) 
         end
-    end
-    function retval:traceback(errortext, class, lineno)
+    end,
+    traceback = function(errortext, class, lineno)
         local i = 4
         local statuse, erre = nil
         self.fileDescriptor.write(dayToString(os.day()) .. " " .. textutils.formatTime(os.time(), false) .. " [Traceback] ")
@@ -149,13 +152,12 @@ local function CCLog(name)
         if (self.showInDefaultLog) then 
             default:traceback(self.name, errortext, class, lineno) 
         end
-    end
-    function retval:close()
+    end,
+    close = function()
         self.fileDescriptor.close()
         self.fileDescriptor = nil
     end
-    return retval
-end
+}
 
 default.fileDescriptor = nil
 default.shell = nil

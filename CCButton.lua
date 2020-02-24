@@ -6,16 +6,18 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
+local class = require "class"
 local CCKitGlobals = require "CCKitGlobals"
 local CCControl = require "CCControl"
 local CCGraphics = require "CCGraphics"
 
-local function CCButton(x, y, width, height)
-    local retval = CCControl(x, y, width, height)
-    retval.textColor = CCKitGlobals.defaultTextColor
-    retval.text = nil
-    retval.backgroundColor = CCKitGlobals.buttonColor
-    function retval:draw()
+self, super = nil -- to silence errors
+
+return class "CCButton" {extends = CCControl} {
+    textColor = CCKitGlobals.defaultTextColor,
+    text = nil,
+    backgroundColor = CCKitGlobals.buttonColor,
+    draw = function()
         if self.parentWindow ~= nil then
             local textColor
             local backgroundColor
@@ -26,19 +28,16 @@ local function CCButton(x, y, width, height)
             else backgroundColor = self.backgroundColor end
             if self.isEnabled then textColor = self.textColor else textColor = CCKitGlobals.buttonDisabledTextColor end
             CCGraphics.drawBox(self.window, 0, 0, self.frame.width, self.frame.height, backgroundColor, textColor)
-            if retval.text ~= nil then CCGraphics.setString(self.window, math.floor((self.frame.width - string.len(self.text)) / 2), math.floor((self.frame.height - 1) / 2), self.text) end
-            for k,v in pairs(self.subviews) do v:draw() end
+            if self.text ~= nil then CCGraphics.setString(self.window, math.floor((self.frame.width - string.len(self.text)) / 2), math.floor((self.frame.height - 1) / 2), self.text) end
+            for _,v in ipairs(self.subviews) do v.draw() end
         end
-    end
-    function retval:setText(text)
+    end,
+    setText = function(text)
         self.text = text
-        self:draw()
-    end
-    function retval:setTextColor(color)
+        self.draw()
+    end,
+    setTextColor = function(color)
         self.textColor = color
-        self:draw()
+        self.draw()
     end
-    return retval
-end
-
-return CCButton
+}

@@ -7,6 +7,7 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
+local class = require "class"
 local CCKitGlobals = require "CCKitGlobals"
 local CCLog = require "CCLog"
 local CCImageType = require "CCImageType"
@@ -56,7 +57,7 @@ local function loadNFP(inputf)
             retval[x-offset][k-1] = {}
             local ch = string.sub(v, x-offset+1, x-offset+1)
             if type(ch) ~= "string" or ch == "" or ch == nil then ch = " " end
-            --CCLog.default:debug("decoder", "ch is " .. tostring(ch) .. ", x is " .. x)
+            --CCLog.default.debug("decoder", "ch is " .. tostring(ch) .. ", x is " .. x)
             if ch == " " then retval[x-offset][k-1].transparent = true
             else retval[x-offset][k-1].bgColor = bit.blshift(1, tonumber(ch, 16)) end
             retval[x-offset][k-1].fgColor = 1
@@ -71,13 +72,12 @@ local function loadNFP(inputf)
     return retval
 end
 
-local function CCImageLoader()
-    local retval = {}
-    retval.fileHandle = nil
-    retval.isOpen = false
-    retval.type = CCImageType.none
-    retval.fileName = nil
-    function retval:open(file)
+return class "CCImageLoader" {
+    fileHandle = nil,
+    isOpen = false,
+    type = CCImageType.none,
+    fileName = nil,
+    open = function(file)
         self.fileHandle = fs.open(file, "r")
         if self.fileHandle == nil then return -1 end
         self.isOpen = true
@@ -89,24 +89,21 @@ local function CCImageLoader()
         elseif string.find(file, ".gif") ~= nil then self.type = CCImageType.gif
         else return 1 end
         return 0
-    end
-    function retval:read()
+    end,
+    read = function()
         if not self.isOpen or self.type == CCImageType.none then return {width = 0, height = 0, termWidth = 0, termHeight = 0} end
         if self.type == CCImageType.ccg then return loadCCG(self.fileHandle.readLine)
         elseif self.type == CCImageType.nfp then return loadNFP(self.fileHandle.readLine)
         else
-            CCLog.default:error(self.fileName, "File type " .. tostring(self.type) .. " not supported yet", "CCImageLoader", 94)
+            CCLog.default.error(self.fileName, "File type " .. tostring(self.type) .. " not supported yet", "CCImageLoader", 94)
             return {width = 0, height = 0, termWidth = 0, termHeight = 0}
         end
-    end
-    function retval:close()
+    end,
+    close = function()
         self.fileHandle.close()
         self.isOpen = false
         self.type = CCImageType.none
         self.fileName = nil
         self.fileHandle = nil
     end
-    return retval
-end
-
-return CCImageLoader
+}

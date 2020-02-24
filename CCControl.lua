@@ -7,74 +7,76 @@
 --
 -- Copyright (c) 2018 JackMacWindows.
 
-local CCKitGlobals = require "CCKitGlobals"
+local class = require "class"
 local CCEventHandler = require "CCEventHandler"
 local CCView = require "CCView"
 local CCWindowRegistry = require "CCWindowRegistry"
 
-local function CCControl(x, y, width, height)
-    local retval = CCKitGlobals.multipleInheritance(CCView(x, y, width, height), CCEventHandler("CCControl"))
-    retval.hasEvents = true
-    retval.isEnabled = true
-    retval.isSelected = false
-    retval.isHighlighted = false
-    retval.action = nil
-    retval.actionObject = nil
-    function retval:setAction(func, obj)
+self, super = nil
+
+return class "CCControl" {extends = {CCView, CCEventHandler}} {
+    hasEvents = true,
+    isEnabled = true,
+    isSelected = false,
+    isHighlighted = false,
+    action = nil,
+    actionObject = nil,
+    __init = function(x, y, width, height)
+        _ENV.CCView(x, y, width, height)
+        _ENV.CCEventHandler("CCControl")
+        self.addEvent("key", self.onKeyDown)
+        self.addEvent("key_up", self.onKeyUp)
+        self.addEvent("mouse_click", self.onMouseDown)
+        self.addEvent("mouse_up", self.onMouseUp)
+    end,
+    setAction = function(func, obj)
         self.action = func
         self.actionObject = obj
-    end
-    function retval:setHighlighted(h)
+    end,
+    setHighlighted = function(h)
         self.isHighlighted = h
-        self:draw()
-    end
-    function retval:setEnabled(e)
+        self.draw()
+    end,
+    setEnabled = function(e)
         self.isEnabled = e
-        self:draw()
-    end
-    function retval:onMouseDown(button, px, py)
+        self.draw()
+    end,
+    onMouseDown = function(button, px, py)
         if not CCWindowRegistry.rayTest(self.application.objects[self.parentWindowName], px, py) then return false end
         local bx = self.frame.absoluteX
         local by = self.frame.absoluteY
         if px >= bx and py >= by and px < bx + self.frame.width and py < by + self.frame.height and button == 1 and self.action ~= nil and self.isEnabled then 
             self.isSelected = true
-            self:draw()
+            self.draw()
             return true
         end
         return false
-    end
-    function retval:onMouseUp(button, px, py)
+    end,
+    onMouseUp = function(button, px, py)
         --if not CCWindowRegistry.rayTest(self.application.objects[self.parentWindowName], px, py) then return false end
         if self.isSelected and button == 1 then 
             self.isSelected = false
-            self:draw()
+            self.draw()
             self.action(self.actionObject)
             return true
         end
         return false
-    end
-    function retval:onKeyDown(key, held)
+    end,
+    onKeyDown = function(key, held)
         if self.isHighlighted and key == keys.enter and self.isEnabled then 
             self.isSelected = true
-            self:draw()
+            self.draw()
             return true
         end
         return false
-    end
-    function retval:onKeyUp(key)
+    end,
+    onKeyUp = function(key)
         if self.isHighlighted and self.isSelected and key == keys.enter and self.isEnabled then
             self.isSelected = false
-            self:draw()
+            self.draw()
             self.action(self.actionObject)
             return true
         end
         return false
     end
-    retval:addEvent("key", retval.onKeyDown)
-    retval:addEvent("key_up", retval.onKeyUp)
-    retval:addEvent("mouse_click", retval.onMouseDown)
-    retval:addEvent("mouse_up", retval.onMouseUp)
-    return retval
-end
-
-return CCControl
+}
